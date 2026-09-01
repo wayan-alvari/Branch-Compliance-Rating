@@ -46,7 +46,10 @@ CodeCoverage/
 .vs/
 .vscode/
 .codex*/
-Docs/
+
+# Local Codex build contract (never publish); other project docs remain trackable
+/Docs/Guide.md
+/Docs/Prompt.md
 
 # MSBuild Binary and Structured Log
 *.binlog
