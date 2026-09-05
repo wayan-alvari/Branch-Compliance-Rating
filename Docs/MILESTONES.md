@@ -14,7 +14,7 @@ ignored. No deployment, remote push, history rewrite, or Docker is authorized.
 | 0 | License, notices, independence, README, ignore rules | Documentation and prohibited-content scan | `docs: define branch compliance portfolio scope` | Complete |
 | 1 | Solution/layers, central pins, SDK/tools, AdminLTE | Locked restore and build | `chore: scaffold branch compliance solution` | Complete |
 | 2 | Identity, demo users, policies, login/logout, shell | Authentication tests | `feat(auth): add compliance demo roles` | Complete |
-| 3 | Workspace scope and six-hour reset | Isolation/reset tests | `feat(demo): isolate compliance workspaces` | Pending |
+| 3 | Workspace scope and six-hour reset | Isolation/reset tests | `feat(demo): isolate compliance workspaces` | Complete |
 | 4 | Domain, mappings/migration, synthetic seeds | Domain/persistence tests | `feat(data): model compliance assessments` | Pending |
 | 5 | Dashboards and work queues | View/controller tests | `feat(dashboard): show compliance workflow progress` | Pending |
 | 6 | Branches and template versions | Validation/authorization tests | `feat(templates): configure versioned criteria` | Pending |
@@ -68,3 +68,12 @@ layout, browser errors, and clean working tree.
   AdminLTE shell uses local scripts/styles and a restrictive CSP. Development
   startup is explicit; shared demo identities use client-based rate limiting
   instead of a shared account lockout that could block other browsers.
+- Milestone 3: formatting and Release build passed without warnings/errors;
+  two unit and 15 integration tests passed. Tests exercise six-hour boundaries,
+  throttled activity and loss of process memory, two-browser isolation, role
+  switching, cross-workspace query/write rejection, immutable audit rows,
+  concurrent reset convergence, evidence-directory removal, shared Identity
+  preservation, excluded health/static activity, and disabled demo reset. The
+  private atomic activity marker prevents early expiry after restart; the
+  database timestamp is throttled and periodically flushed. Single-process
+  hosting and retirement metadata are documented in the architecture notes.

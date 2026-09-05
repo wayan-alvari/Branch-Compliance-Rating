@@ -50,3 +50,31 @@ operation. Snapshot and history rows are immutable after their creation.
 
 Further implementation decisions and their validation are recorded in the
 milestone plan and the final operations documentation.
+
+## Workspace lifecycle
+
+Run a single application process for this demo. A process coordinator holds a
+lease throughout each meaningful MVC request and cleanup, preventing reset from
+removing in-use rows or evidence. Database transactions make fresh seeding atomic.
+Opaque retirement metadata makes requests carrying the same expired cookie
+converge on one replacement. Cookies are protected with ASP.NET Data Protection,
+HTTP-only, persistent, and secure on HTTPS (always secure outside Development).
+
+Meaningful authenticated visits and commands update exact UTC activity. Database
+timestamp writes are throttled to once per minute; an atomic, server-owned UTC
+marker in the workspace's private evidence directory preserves intervening
+activity across process restart. It contains no credentials or assessment data.
+Cleanup runs each minute and flushes observed activity to the database. Static
+files, health, and unknown endpoints never create workspaces or extend activity;
+there are no polling routes. Login creates the initial scenario, while repeated
+anonymous visits do not extend its activity. All reset entry points require
+`DemoMode:Enabled=true`.
+
+Expiry is exact at six hours from the last meaningful activity. Request-time
+expiry removes only the expired workspace's domain rows and private directory,
+then transactionally seeds a new workspace. Shared Identity records survive.
+EF filters exclude other workspace rows, write guards reject cross-workspace
+changes, and audit rows cannot be modified or deleted through normal persistence.
+Database cascades perform the dedicated expired-workspace cleanup. Multi-process
+hosting requires a distributed coordinator and shared storage; it is not a
+supported deployment mode for this portfolio implementation.

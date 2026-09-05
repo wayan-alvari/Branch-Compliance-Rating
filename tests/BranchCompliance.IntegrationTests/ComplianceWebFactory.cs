@@ -1,11 +1,13 @@
 using System.Net;
 using System.Text.RegularExpressions;
+using BranchCompliance.Application.Workspaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace BranchCompliance.IntegrationTests;
 
@@ -14,6 +16,7 @@ public sealed class ComplianceWebFactory : WebApplicationFactory<Program>
     private readonly SqliteConnection _keepAlive;
     private readonly string _testRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../.local/test-runs"));
     public string FilesRoot { get; }
+    public FakeClock Clock { get; } = new();
 
     public ComplianceWebFactory()
     {
@@ -32,9 +35,15 @@ public sealed class ComplianceWebFactory : WebApplicationFactory<Program>
             ["Database:Initialize"] = "true",
             ["Database:Provider"] = "Sqlite",
             ["ConnectionStrings:DemoSqlite"] = _keepAlive.ConnectionString,
-            ["DataProtection:KeyPath"] = Path.Combine(FilesRoot, "keys")
+            ["DataProtection:KeyPath"] = Path.Combine(FilesRoot, "keys"),
+            ["Evidence:RootPath"] = Path.Combine(FilesRoot, "evidence")
         }));
-        builder.ConfigureTestServices(services => services.AddControllers().AddApplicationPart(typeof(PolicyProbeController).Assembly));
+        builder.ConfigureTestServices(services =>
+        {
+            services.RemoveAll<IClock>();
+            services.AddSingleton<IClock>(Clock);
+            services.AddControllers().AddApplicationPart(typeof(PolicyProbeController).Assembly);
+        });
     }
 
     public HttpClient Browser() => CreateClient(new WebApplicationFactoryClientOptions

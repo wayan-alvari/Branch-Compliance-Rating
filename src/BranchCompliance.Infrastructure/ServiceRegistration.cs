@@ -1,6 +1,8 @@
 using BranchCompliance.Application.Security;
+using BranchCompliance.Application.Workspaces;
 using BranchCompliance.Infrastructure.Identity;
 using BranchCompliance.Infrastructure.Persistence;
+using BranchCompliance.Infrastructure.Workspaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +16,14 @@ public static class ServiceRegistration
     public static IServiceCollection AddComplianceInfrastructure(this IServiceCollection services,
         IConfiguration configuration, IHostEnvironment environment)
     {
+        services.AddSingleton<IClock, SystemClock>();
+        services.AddScoped<WorkspaceContext>();
+        services.AddScoped<IWorkspaceContext>(provider => provider.GetRequiredService<WorkspaceContext>());
+        services.AddSingleton<WorkspaceCoordinator>();
+        services.AddSingleton<WorkspaceFileStore>();
+        services.AddScoped<IWorkspaceSeeder, WorkspaceSeeder>();
+        services.AddScoped<IWorkspaceLifecycle, WorkspaceLifecycle>();
+        services.AddHostedService<WorkspaceCleanupService>();
         services.AddDbContext<ComplianceDbContext>(options =>
         {
             if (configuration["Database:Provider"] == "Sqlite")

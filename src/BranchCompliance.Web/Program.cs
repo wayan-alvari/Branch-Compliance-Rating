@@ -2,6 +2,7 @@ using System.Threading.RateLimiting;
 using BranchCompliance.Infrastructure;
 using BranchCompliance.Infrastructure.Identity;
 using BranchCompliance.Infrastructure.Persistence;
+using BranchCompliance.Web.Middleware;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -77,6 +78,7 @@ app.Use(async (context, next) =>
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
+app.UseMiddleware<DemoWorkspaceMiddleware>();
 app.UseAuthorization();
 app.UseRateLimiter();
 app.MapGet("/health", () => Results.Text("Healthy")).AllowAnonymous();
