@@ -84,3 +84,11 @@ layout, browser errors, and clean working tree.
   contributions/final rounding, and competition ranking. This coherent domain
   portion is committed separately before period/assessment persistence work;
   milestone 4 remains incomplete until mappings, migration, and seeds pass.
+- Milestone 4, workflow-domain checkpoint: Release build and formatting passed;
+  24 unit and 15 integration tests passed. Period/assessment transitions,
+  immutable snapshots, evidence metadata/completion, score revisions, appeal
+  acceptance/rejection, finalization guards, and deadline boundaries are modeled.
+  A complete domain scenario proves provisional 70.00 remains unchanged while
+  an accepted criterion revision produces final 85.00 / Good, with the original
+  60.00 criterion revision retained. Persistence and the public workflow remain
+  subsequent work; this checkpoint does not claim their completion.

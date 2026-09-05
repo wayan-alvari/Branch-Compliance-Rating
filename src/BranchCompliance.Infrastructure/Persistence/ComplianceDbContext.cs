@@ -50,6 +50,7 @@ public partial class ComplianceDbContext(DbContextOptions<ComplianceDbContext> o
         entity.Ignore(row => row.PendingAudit);
         entity.HasBaseType((Type?)null);
         entity.HasKey(row => row.Id);
+        entity.Property(row => row.ChangeVersion).IsConcurrencyToken();
         entity.HasIndex(row => new { row.WorkspaceId, row.Id }).IsUnique();
         entity.HasQueryFilter(row => row.WorkspaceId == CurrentWorkspaceId);
         entity.HasOne<DemoWorkspace>().WithMany().HasForeignKey(row => row.WorkspaceId).OnDelete(DeleteBehavior.Cascade);

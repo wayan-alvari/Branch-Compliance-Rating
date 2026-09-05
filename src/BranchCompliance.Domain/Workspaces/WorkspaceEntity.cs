@@ -6,6 +6,7 @@ public abstract class WorkspaceEntity
     public IReadOnlyCollection<AuditEvent> PendingAudit => _pendingAudit.AsReadOnly();
     public Guid Id { get; protected set; } = Guid.NewGuid();
     public Guid WorkspaceId { get; protected set; }
+    public int ChangeVersion { get; private set; }
     protected WorkspaceEntity() { }
     protected WorkspaceEntity(Guid workspaceId)
     {
@@ -16,6 +17,7 @@ public abstract class WorkspaceEntity
     protected void Record(string actorId, string action, DateTime now, string details)
     {
         Rules.Rule.Utc(now);
+        ChangeVersion = checked(ChangeVersion + 1);
         _pendingAudit.Add(new AuditEvent(WorkspaceId, actorId, action, Id, now, details));
     }
 
