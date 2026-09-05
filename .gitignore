@@ -62,3 +62,26 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# Local prerequisites, caches, credentials, evidence and generated assets
+/.local/
+/node_modules/
+/.npm-cache/
+/.nuget/
+/.dotnet-home/
+/publish/
+/evidence/
+/data/
+**/appsettings.Local.json
+**/appsettings.*.local.json
+**/secrets.json
+.env.*
+*.db
+*.db-*
+*.sqlite*
+*.pfx
+*.pem
+*.key
+/src/BranchCompliance.Web/wwwroot/vendor/
+/playwright-report/
+/test-results/
