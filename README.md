@@ -45,6 +45,18 @@ If SDK 8.0.424 was extracted to `.local/dotnet`, first run
 helper also keeps .NET/NuGet caches inside ignored repository directories.
 The build uses only official packages; `npm ci` prepares the production assets.
 
+For an explicitly initialized, secret-free development demo:
+
+```powershell
+./scripts/Start-Demo.ps1 -Sqlite
+```
+
+Open `http://localhost:5094`. This command enables Development and DemoMode and
+creates a local ignored SQLite database and four demo identities idempotently.
+SQLite is rejected outside Development. Production initialization never runs
+automatically. MySQL migration and setup instructions are added at the data
+checkpoint.
+
 ## Demo roles
 
 | Role | Email | Password |

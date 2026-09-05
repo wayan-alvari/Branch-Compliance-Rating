@@ -1,0 +1,41 @@
+@model LoginModel
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@{ ViewData["Title"] = "A clear path from evidence to rating"; }
+<div class="row g-4">
+    <div class="col-lg-7">
+        <section class="story-panel">
+            <p class="eyebrow">BRANCH COMPLIANCE &amp; RATING</p>
+            <h2 class="display-6 fw-semibold">Make every assessment<br />easy to explain.</h2>
+            <p class="lead">Define fair criteria, gather branch evidence, review scores, and resolve appeals with a visible history of every decision.</p>
+            <ol class="workflow-strip"><li>Configure</li><li>Submit</li><li>Assess</li><li>Appeal</li><li>Finalize</li></ol>
+            <p class="small mt-4 mb-0">Built independently from generic assessment concepts. No employer code, confidential data, proprietary scoring, branding, or copied business assets.</p>
+        </section>
+        @if (Configuration.GetValue<bool>("DemoMode:Enabled"))
+        {
+            <section class="card mt-4"><div class="card-body">
+                <h2 class="h5">Explore all four roles</h2>
+                <p>Use password <code>PortfolioDemo123!</code> for every demo account. Log out to switch roles in this browser and keep your workflow.</p>
+                <div class="table-responsive"><table class="table align-middle"><caption class="visually-hidden">Public demo sign-in credentials</caption><thead><tr><th>Role</th><th>Email</th></tr></thead><tbody>
+                    @foreach (var account in DemoIdentitySeeder.Accounts)
+                    {
+                        <tr><td>@DemoRoles.Label(account.Role)</td><td><button class="btn btn-link p-0 text-start demo-account" type="button" data-email="@account.Email">@account.Email</button></td></tr>
+                    }
+                </tbody></table></div>
+                <p class="small text-secondary mb-0">Use a private window for an independent scenario. Demo identities and roles cannot be changed.</p>
+            </div></section>
+        }
+    </div>
+    <div class="col-lg-5">
+        <section class="card login-card"><div class="card-body p-4">
+            <h2 class="h4">Sign in to your workspace</h2>
+            <p class="text-secondary">Choose a demo role to follow its part of the assessment.</p>
+            <form asp-action="Login" method="post">
+                <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+                <input asp-for="ReturnUrl" type="hidden" />
+                <div class="mb-3"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" autocomplete="username" required /></div>
+                <div class="mb-4"><label asp-for="Password" class="form-label"></label><input asp-for="Password" class="form-control" autocomplete="current-password" required /></div>
+                <button class="btn btn-primary w-100" type="submit">Open workspace</button>
+            </form>
+        </div></section>
+    </div>
+</div>

@@ -13,7 +13,7 @@ ignored. No deployment, remote push, history rewrite, or Docker is authorized.
 |---|---|---|---|---|
 | 0 | License, notices, independence, README, ignore rules | Documentation and prohibited-content scan | `docs: define branch compliance portfolio scope` | Complete |
 | 1 | Solution/layers, central pins, SDK/tools, AdminLTE | Locked restore and build | `chore: scaffold branch compliance solution` | Complete |
-| 2 | Identity, demo users, policies, login/logout, shell | Authentication tests | `feat(auth): add compliance demo roles` | Pending |
+| 2 | Identity, demo users, policies, login/logout, shell | Authentication tests | `feat(auth): add compliance demo roles` | Complete |
 | 3 | Workspace scope and six-hour reset | Isolation/reset tests | `feat(demo): isolate compliance workspaces` | Pending |
 | 4 | Domain, mappings/migration, synthetic seeds | Domain/persistence tests | `feat(data): model compliance assessments` | Pending |
 | 5 | Dashboards and work queues | View/controller tests | `feat(dashboard): show compliance workflow progress` | Pending |
@@ -60,3 +60,11 @@ layout, browser errors, and clean working tree.
   zero vulnerabilities. Direct package license metadata was inspected. Windows
   sandbox build processes exited without diagnostics, while the same commands
   passed with approved normal process/network access.
+- Milestone 2: formatting and Release build passed (zero warnings/errors); all
+  eight SQLite HTTP authentication tests passed. Coverage includes four demo
+  logins/logout, every role policy allow/deny pair, missing antiforgery rejection,
+  invalid credentials, external return-URL rejection, public credentials/health,
+  absent identity-management routes, and repeated identity seeding. Original
+  AdminLTE shell uses local scripts/styles and a restrictive CSP. Development
+  startup is explicit; shared demo identities use client-based rate limiting
+  instead of a shared account lockout that could block other browsers.
