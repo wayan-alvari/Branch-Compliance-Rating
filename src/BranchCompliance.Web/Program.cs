@@ -1,8 +1,11 @@
 using System.Threading.RateLimiting;
+using BranchCompliance.Application.Security;
 using BranchCompliance.Infrastructure;
 using BranchCompliance.Infrastructure.Identity;
 using BranchCompliance.Infrastructure.Persistence;
+using BranchCompliance.Web.Filters;
 using BranchCompliance.Web.Middleware;
+using BranchCompliance.Web.Security;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -12,7 +15,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false);
 builder.Configuration.AddEnvironmentVariables();
 builder.Services.AddComplianceInfrastructure(builder.Configuration, builder.Environment);
-builder.Services.AddControllersWithViews(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentActor, HttpCurrentActor>();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+    options.Filters.Add<ApplicationExceptionFilter>();
+});
 builder.Services.AddAntiforgery(options =>
 {
     options.Cookie.Name = "BranchCompliance.Antiforgery";

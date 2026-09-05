@@ -16,7 +16,7 @@ ignored. No deployment, remote push, history rewrite, or Docker is authorized.
 | 2 | Identity, demo users, policies, login/logout, shell | Authentication tests | `feat(auth): add compliance demo roles` | Complete |
 | 3 | Workspace scope and six-hour reset | Isolation/reset tests | `feat(demo): isolate compliance workspaces` | Complete |
 | 4 | Domain, mappings/migration, synthetic seeds | Domain/persistence tests | `feat(data): model compliance assessments` | Complete |
-| 5 | Dashboards and work queues | View/controller tests | `feat(dashboard): show compliance workflow progress` | Pending |
+| 5 | Dashboards and work queues | View/controller tests | `feat(dashboard): show compliance workflow progress` | Complete |
 | 6 | Branches and template versions | Validation/authorization tests | `feat(templates): configure versioned criteria` | Pending |
 | 7 | Period snapshots, assignments, phases | Snapshot/transition tests | `feat(periods): open snapshotted assessment periods` | Pending |
 | 8 | Responses, protected evidence, submission | Branch/evidence tests | `feat(submissions): collect branch compliance evidence` | Pending |
@@ -102,3 +102,11 @@ layout, browser errors, and clean working tree.
   placeholder when resolving registered options; runtime still requires local
   configuration. No MySQL connection secret is available, so live migration and
   the optional smoke workflow are documented in DATABASE.md, not claimed as run.
+- Milestone 5: formatting and Release build passed; 25 unit and 25 integration
+  tests passed. Four role-specific dashboards display deadline/phase progress,
+  scoped queues, response/evidence completion, final result previews with global
+  competition rank, and scoped recent activity. HTTP/store tests prove Branch
+  User sees only Harbor Point, an unassigned Assessor sees an empty dashboard,
+  unknown roles/wrong workspace queries fail, and unpublished values are hidden.
+  Application actor/access services and centralized safe expected-error handling
+  provide the authorization foundation for the remaining command pages.

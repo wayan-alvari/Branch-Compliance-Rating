@@ -1,7 +1,9 @@
+using BranchCompliance.Application.Dashboard;
 using BranchCompliance.Application.Security;
 using BranchCompliance.Application.Workspaces;
 using BranchCompliance.Infrastructure.Identity;
 using BranchCompliance.Infrastructure.Persistence;
+using BranchCompliance.Infrastructure.Queries;
 using BranchCompliance.Infrastructure.Workspaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +20,8 @@ public static class ServiceRegistration
         IConfiguration configuration, IHostEnvironment environment)
     {
         services.AddSingleton<IClock, SystemClock>();
+        services.AddScoped<IDashboardStore, DashboardStore>();
+        services.AddScoped<DashboardService>();
         services.AddScoped<WorkspaceContext>();
         services.AddScoped<IWorkspaceContext>(provider => provider.GetRequiredService<WorkspaceContext>());
         services.AddSingleton<WorkspaceCoordinator>();

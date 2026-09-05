@@ -1,6 +1,89 @@
-@{ ViewData["Title"] = "Workspace overview"; }
-<section class="card"><div class="card-body">
-    <h2 class="h4">Your assessment workspace</h2>
-    <p>Signed in as <strong>@User.Identity?.Name</strong>.</p>
-    <p class="mb-0">A transparent assessment connects branch evidence, criterion scores, appeal decisions, and a final rating. Use the same browser when switching roles.</p>
+@model DashboardModel
+@{
+    ViewData["Title"] = Model.Role switch
+    {
+        DemoRoles.Administrator => "Guide the assessment cycle",
+        DemoRoles.BranchUser => "Your branch, your next step",
+        DemoRoles.Assessor => "Review evidence with confidence",
+        _ => "Appeals & final review"
+    };
+    var subtitle = Model.Role switch
+    {
+        DemoRoles.Administrator => "Follow readiness across branches and move the period forward when each stage is complete.",
+        DemoRoles.BranchUser => "Complete your assigned responses, attach evidence, and follow your published result.",
+        DemoRoles.Assessor => "Review submitted assignments, explain criterion scores, and complete each assessment.",
+        _ => "Resolve pending appeals and confirm that every result is ready to become final."
+    };
+}
+<p class="text-secondary mb-4">@subtitle <span class="d-block small mt-1">Signed in as @Model.DisplayName</span></p>
+<div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3"><section class="card metric-card h-100"><div class="card-body"><p class="metric-label">Assigned branches</p><strong class="metric-value">@Model.Queue.Count</strong><span class="metric-note">in the active period</span></div></section></div>
+    <div class="col-6 col-xl-3"><section class="card metric-card h-100"><div class="card-body"><p class="metric-label">Submitted</p><strong class="metric-value">@Model.SubmittedCount <small>/ @Model.Queue.Count</small></strong><span class="metric-note">responses ready for review</span></div></section></div>
+    <div class="col-6 col-xl-3"><section class="card metric-card h-100"><div class="card-body"><p class="metric-label">@(Model.Role == DemoRoles.Assessor ? "Ready to score" : "Scoring complete")</p><strong class="metric-value">@(Model.Role == DemoRoles.Assessor ? Model.ReadyToScore : Model.ScoredCount)</strong><span class="metric-note">within your assignments</span></div></section></div>
+    <div class="col-6 col-xl-3"><section class="card metric-card h-100"><div class="card-body"><p class="metric-label">Pending appeals</p><strong class="metric-value">@Model.PendingAppeals</strong><span class="metric-note">awaiting a decision</span></div></section></div>
+</div>
+@if (Model.Period is { } period)
+{
+    <section class="card mb-4"><div class="card-body">
+        <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap"><div><p class="eyebrow text-secondary mb-1">ACTIVE PERIOD</p><h2 class="h4 mb-1">@period.Name</h2><p class="text-secondary small">@period.CriterionCount criteria · fixed weights total 100%</p></div><span class="status-label">@WorkflowLabels.Phase(period.Phase)</span></div>
+        <ol class="phase-steps" aria-label="Assessment workflow phases">
+            @foreach (var phase in new[] { PeriodPhase.SubmissionOpen, PeriodPhase.AssessmentOpen, PeriodPhase.AppealOpen, PeriodPhase.FinalReview, PeriodPhase.Finalized })
+            {
+                <li class="@(phase == period.Phase ? "current" : "")" aria-current="@(phase == period.Phase ? "step" : "false")">@WorkflowLabels.Phase(phase)</li>
+            }
+        </ol>
+        <div class="deadline-grid">
+            <div><span>Submission deadline</span><time datetime="@period.SubmissionDeadlineUtc.ToString("O")">@period.SubmissionDeadlineUtc.ToString("dd MMM yyyy HH:mm") UTC</time></div>
+            <div><span>Assessment deadline</span><time datetime="@period.AssessmentDeadlineUtc.ToString("O")">@period.AssessmentDeadlineUtc.ToString("dd MMM yyyy HH:mm") UTC</time></div>
+            <div><span>Appeal deadline</span><time datetime="@period.AppealDeadlineUtc.ToString("O")">@period.AppealDeadlineUtc.ToString("dd MMM yyyy HH:mm") UTC</time></div>
+            <div><span>Finalization deadline</span><time datetime="@period.FinalizationDeadlineUtc.ToString("O")">@period.FinalizationDeadlineUtc.ToString("dd MMM yyyy HH:mm") UTC</time></div>
+        </div>
+        <label for="submission-progress" class="small mt-3 d-block">@Model.SubmittedCount of @Model.Queue.Count branches submitted</label>
+        <progress id="submission-progress" class="workflow-progress" max="@Math.Max(1, Model.Queue.Count)" value="@Model.SubmittedCount">@Model.SubmittedCount of @Model.Queue.Count</progress>
+    </div></section>
+}
+else
+{
+    <div class="alert alert-light border">There is no active period in your assignments. Completed results remain available below.</div>
+}
+<section class="card mb-4"><div class="card-header bg-transparent"><h2 class="h5 mb-0">Your work queue</h2></div><div class="card-body">
+    @if (Model.Queue.Count == 0)
+    {
+        <p class="text-secondary mb-0">No active assignments need your attention.</p>
+    }
+    else
+    {
+        <div class="table-responsive"><table class="table align-middle mb-0"><caption class="visually-hidden">Authorized branch assignments and completion</caption><thead><tr><th>Branch</th><th>Status</th><th>Responses &amp; evidence</th><th>Criteria scored</th><th>Published result</th></tr></thead><tbody>
+        @foreach (var item in Model.Queue)
+        {
+            <tr data-assessment-id="@item.AssessmentId"><td class="fw-semibold">@item.BranchName</td><td><span class="status-label">@WorkflowLabels.Assessment(item.State)</span></td><td>@item.CompletedResponses / @item.CriterionCount complete</td><td>@item.ScoredCriteria / @item.CriterionCount</td><td>@(item.VisibleScore is null ? "Not published" : $"{item.VisibleScore:F2} · {item.VisibleRating}")</td></tr>
+        }
+        </tbody></table></div>
+    }
+    @if (Model.Role == DemoRoles.Assessor && Model.Period?.Phase == PeriodPhase.SubmissionOpen)
+    {
+        <p class="small text-secondary mt-3 mb-0">Scoring opens after the Administrator closes submissions.</p>
+    }
+    @if (Model.Role == DemoRoles.Approver)
+    {
+        <p class="small text-secondary mt-3 mb-0">Finalization requires final review, completed scoring, and a decision on every appeal.</p>
+    }
 </div></section>
+<div class="row g-4">
+    <div class="col-xl-6"><section class="card h-100"><div class="card-header bg-transparent"><h2 class="h5 mb-0">Completed results <span class="text-secondary fw-normal">(@Model.CompletedCount)</span></h2></div><div class="card-body">
+        @if (Model.History.Count == 0) { <p class="text-secondary">No final results are available in your assignments yet.</p> }
+        @foreach (var result in Model.History)
+        {
+            <div class="result-teaser"><div class="d-flex justify-content-between gap-3"><div><strong>@result.BranchName</strong><span class="d-block small text-secondary">@result.PeriodName · Rank @result.Rank</span></div><div class="text-end"><strong>@result.Score.ToString("F2")</strong><span class="d-block small">@result.Rating</span></div></div><meter class="score-meter" min="0" max="100" value="@result.Score.ToString(System.Globalization.CultureInfo.InvariantCulture)" aria-label="@result.BranchName final score @result.Score out of 100">@result.Score / 100</meter></div>
+        }
+    </div></section></div>
+    <div class="col-xl-6"><section class="card h-100"><div class="card-header bg-transparent"><h2 class="h5 mb-0">Recent activity</h2></div><div class="card-body">
+        @if (Model.Activity.Count == 0) { <p class="text-secondary">No activity is available in your role's context yet.</p> }
+        <ol class="activity-list">
+        @foreach (var activity in Model.Activity)
+        {
+            <li><strong>@activity.Action</strong><p class="small mb-1">@activity.Details</p><time class="small text-secondary" datetime="@activity.AtUtc.ToString("O")">@activity.AtUtc.ToString("dd MMM yyyy HH:mm") UTC</time></li>
+        }
+        </ol>
+    </div></section></div>
+</div>
