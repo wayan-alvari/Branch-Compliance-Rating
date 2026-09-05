@@ -15,7 +15,7 @@ ignored. No deployment, remote push, history rewrite, or Docker is authorized.
 | 1 | Solution/layers, central pins, SDK/tools, AdminLTE | Locked restore and build | `chore: scaffold branch compliance solution` | Complete |
 | 2 | Identity, demo users, policies, login/logout, shell | Authentication tests | `feat(auth): add compliance demo roles` | Complete |
 | 3 | Workspace scope and six-hour reset | Isolation/reset tests | `feat(demo): isolate compliance workspaces` | Complete |
-| 4 | Domain, mappings/migration, synthetic seeds | Domain/persistence tests | `feat(data): model compliance assessments` | Pending |
+| 4 | Domain, mappings/migration, synthetic seeds | Domain/persistence tests | `feat(data): model compliance assessments` | In progress |
 | 5 | Dashboards and work queues | View/controller tests | `feat(dashboard): show compliance workflow progress` | Pending |
 | 6 | Branches and template versions | Validation/authorization tests | `feat(templates): configure versioned criteria` | Pending |
 | 7 | Period snapshots, assignments, phases | Snapshot/transition tests | `feat(periods): open snapshotted assessment periods` | Pending |
@@ -77,3 +77,10 @@ layout, browser errors, and clean working tree.
   private atomic activity marker prevents early expiry after restart; the
   database timestamp is throttled and periodically flushed. Single-process
   hosting and retirement metadata are documented in the architecture notes.
+- Milestone 4, domain checkpoint: formatting and Release build passed without
+  warnings/errors; 17 unit and 15 integration tests passed. Added original
+  template aggregates, immutable published versions with independent draft
+  copies, exact weight validation, rating validation/boundaries, decimal-only
+  contributions/final rounding, and competition ranking. This coherent domain
+  portion is committed separately before period/assessment persistence work;
+  milestone 4 remains incomplete until mappings, migration, and seeds pass.

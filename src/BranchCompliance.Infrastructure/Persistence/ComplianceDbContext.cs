@@ -47,6 +47,7 @@ public partial class ComplianceDbContext(DbContextOptions<ComplianceDbContext> o
     private void ConfigureWorkspaceEntity<T>(ModelBuilder builder) where T : WorkspaceEntity
     {
         var entity = builder.Entity<T>();
+        entity.Ignore(row => row.PendingAudit);
         entity.HasBaseType((Type?)null);
         entity.HasKey(row => row.Id);
         entity.HasIndex(row => new { row.WorkspaceId, row.Id }).IsUnique();
