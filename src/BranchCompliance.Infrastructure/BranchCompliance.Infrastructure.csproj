@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../BranchCompliance.Application/BranchCompliance.Application.csproj" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" />
+    <PackageReference Include="ClosedXML" />
+    <PackageReference Include="PDFsharp-MigraDoc" />
+  </ItemGroup>
+</Project>

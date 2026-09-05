@@ -12,7 +12,7 @@ ignored. No deployment, remote push, history rewrite, or Docker is authorized.
 | # | Deliverable | Validation | Required checkpoint | Status |
 |---|---|---|---|---|
 | 0 | License, notices, independence, README, ignore rules | Documentation and prohibited-content scan | `docs: define branch compliance portfolio scope` | Complete |
-| 1 | Solution/layers, central pins, SDK/tools, AdminLTE | Locked restore and build | `chore: scaffold branch compliance solution` | Pending |
+| 1 | Solution/layers, central pins, SDK/tools, AdminLTE | Locked restore and build | `chore: scaffold branch compliance solution` | Complete |
 | 2 | Identity, demo users, policies, login/logout, shell | Authentication tests | `feat(auth): add compliance demo roles` | Pending |
 | 3 | Workspace scope and six-hour reset | Isolation/reset tests | `feat(demo): isolate compliance workspaces` | Pending |
 | 4 | Domain, mappings/migration, synthetic seeds | Domain/persistence tests | `feat(data): model compliance assessments` | Pending |
@@ -53,3 +53,10 @@ layout, browser errors, and clean working tree.
   reviewed all six new/updated documentation files, verified control files and
   representative SDK/evidence/database/local-setting paths are ignored, and
   passed `git diff --check`. History secret-pattern scan found no matches.
+- Milestone 1: official SDK archive SHA-512 verified; local SDK reports 8.0.424.
+  EF tool 8.0.30 restored; all six package locks generated and locked restore
+  passed. Release build passed with zero warnings/errors; format verification
+  passed. `npm ci`, asset preparation, and `npm audit --omit=dev` passed with
+  zero vulnerabilities. Direct package license metadata was inspected. Windows
+  sandbox build processes exited without diagnostics, while the same commands
+  passed with approved normal process/network access.

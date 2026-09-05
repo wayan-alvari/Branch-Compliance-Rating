@@ -27,6 +27,24 @@ tests use isolated SQLite databases and require no MySQL password.
 Real connection details belong in .NET user secrets or environment variables.
 Never commit credentials, uploads, databases, local settings, or publish output.
 
+## Build the solution
+
+Install the pinned .NET SDK and Node/npm prerequisites above. From this
+repository root:
+
+```powershell
+dotnet tool restore
+dotnet restore --locked-mode
+npm ci
+dotnet build -c Release --no-restore
+dotnet format --verify-no-changes
+```
+
+If SDK 8.0.424 was extracted to `.local/dotnet`, first run
+`. ./scripts/Use-LocalSdk.ps1` in the same PowerShell session. This optional
+helper also keeps .NET/NuGet caches inside ignored repository directories.
+The build uses only official packages; `npm ci` prepares the production assets.
+
 ## Demo roles
 
 | Role | Email | Password |

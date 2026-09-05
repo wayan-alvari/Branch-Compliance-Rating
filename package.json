@@ -1,0 +1,16 @@
+{
+  "name": "branch-compliance-rating",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "engines": { "node": ">=22 <23", "npm": ">=10 <11" },
+  "scripts": {
+    "assets": "node scripts/copy-assets.mjs",
+    "postinstall": "npm run assets"
+  },
+  "dependencies": {
+    "@popperjs/core": "2.11.8",
+    "admin-lte": "4.1.0",
+    "bootstrap": "5.3.8"
+  }
+}
