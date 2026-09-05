@@ -15,7 +15,7 @@ ignored. No deployment, remote push, history rewrite, or Docker is authorized.
 | 1 | Solution/layers, central pins, SDK/tools, AdminLTE | Locked restore and build | `chore: scaffold branch compliance solution` | Complete |
 | 2 | Identity, demo users, policies, login/logout, shell | Authentication tests | `feat(auth): add compliance demo roles` | Complete |
 | 3 | Workspace scope and six-hour reset | Isolation/reset tests | `feat(demo): isolate compliance workspaces` | Complete |
-| 4 | Domain, mappings/migration, synthetic seeds | Domain/persistence tests | `feat(data): model compliance assessments` | In progress |
+| 4 | Domain, mappings/migration, synthetic seeds | Domain/persistence tests | `feat(data): model compliance assessments` | Complete |
 | 5 | Dashboards and work queues | View/controller tests | `feat(dashboard): show compliance workflow progress` | Pending |
 | 6 | Branches and template versions | Validation/authorization tests | `feat(templates): configure versioned criteria` | Pending |
 | 7 | Period snapshots, assignments, phases | Snapshot/transition tests | `feat(periods): open snapshotted assessment periods` | Pending |
@@ -92,3 +92,13 @@ layout, browser errors, and clean working tree.
   an accepted criterion revision produces final 85.00 / Good, with the original
   60.00 criterion revision retained. Persistence and the public workflow remain
   subsequent work; this checkpoint does not claim their completion.
+- Milestone 4 complete: formatting verification, Release build (zero warnings
+  and errors), 24 unit tests, and 20 SQLite integration tests passed. Full seed
+  persistence, PDF fixture parsing/hash checks, every domain table's isolation
+  and reset, composite foreign keys, optimistic conflicts, and immutable records
+  are tested. Initial MySQL migration and idempotent SQL generated successfully;
+  both test and EF tooling report no pending model changes. Migration history
+  uses lowercase table/column names. EF discovery required a design-time-only
+  placeholder when resolving registered options; runtime still requires local
+  configuration. No MySQL connection secret is available, so live migration and
+  the optional smoke workflow are documented in DATABASE.md, not claimed as run.

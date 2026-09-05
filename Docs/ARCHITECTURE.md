@@ -75,6 +75,32 @@ expiry removes only the expired workspace's domain rows and private directory,
 then transactionally seeds a new workspace. Shared Identity records survive.
 EF filters exclude other workspace rows, write guards reject cross-workspace
 changes, and audit rows cannot be modified or deleted through normal persistence.
-Database cascades perform the dedicated expired-workspace cleanup. Multi-process
+The dedicated expired-workspace cleanup deletes rows in leaf-to-root order inside
+a transaction, preserving MySQL restrictive foreign keys. Multi-process
 hosting requires a distributed coordinator and shared storage; it is not a
 supported deployment mode for this portfolio implementation.
+
+## Relational model and history
+
+All 14 domain tables have a workspace query filter, a composite workspace/public
+ID key, and a workspace foreign key. Relationships between domain rows use
+composite foreign keys, so a row cannot reference a different workspace even if
+application validation is bypassed. Decimal columns use precision 5, scale 2;
+UTC timestamp converters preserve their kind when materializing data.
+
+Aggregates emit safe audit events, persisted atomically with their changes.
+Optimistic change versions detect stale updates. Normal persistence rejects
+changes to published templates, period snapshots, score revisions, finalized
+assessments, submitted responses, decided appeals, and audit events. Only the
+dedicated expired-workspace maintenance path bypasses normal history guards.
+
+Branch name/code/region are copied into each assessment assignment so later
+branch edits do not relabel historical results. Source criterion IDs in period
+snapshots are provenance metadata; all evaluation uses period-owned values.
+
+The migration-history table and its columns also use lowercase names. A narrow
+`IHistoryRepository` adapter follows EF's documented extension point and is
+tested against pinned Pomelo 8.0.3; revalidate it during the .NET 10/provider
+upgrade. EF design-time discovery may resolve registered context options before
+calling the factory, so only `EF.IsDesignTime` permits a placeholder connection.
+Runtime configuration still requires an owner's real local connection.

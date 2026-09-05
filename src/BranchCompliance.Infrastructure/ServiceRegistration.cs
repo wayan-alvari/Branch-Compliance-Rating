@@ -5,6 +5,7 @@ using BranchCompliance.Infrastructure.Persistence;
 using BranchCompliance.Infrastructure.Workspaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -39,8 +40,10 @@ public static class ServiceRegistration
             else
             {
                 var connection = configuration.GetConnectionString("DefaultConnection")
-                    ?? throw new InvalidOperationException("Configure the MySQL connection using user secrets or environment variables.");
-                options.UseMySql(connection, new MySqlServerVersion(new Version(8, 0, 46)));
+                    ?? (EF.IsDesignTime ? ComplianceDesignTimeFactory.PlaceholderConnection
+                        : throw new InvalidOperationException("Configure the MySQL connection using user secrets or environment variables."));
+                options.UseMySql(connection, new MySqlServerVersion(new Version(8, 0, 46)), mysql => mysql.MigrationsHistoryTable("__ef_migrations_history"))
+                    .ReplaceService<IHistoryRepository, LowercaseMySqlHistoryRepository>();
             }
         });
 

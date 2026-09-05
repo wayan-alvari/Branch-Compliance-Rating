@@ -12,7 +12,7 @@ public sealed class PolicyProbeController : Controller
 {
     [HttpGet("/test-workspace"), Authorize]
     public async Task<IActionResult> Workspace([FromServices] IWorkspaceContext workspace, [FromServices] ComplianceDbContext db)
-        => Ok(new { workspace.WorkspaceId, AuditIds = await db.AuditEvents.Select(row => row.Id).ToArrayAsync() });
+        => Ok(new { workspace.WorkspaceId, AuditIds = await db.AuditEvents.Where(row => row.Action == "Workspace created").Select(row => row.Id).ToArrayAsync() });
 
     [HttpGet("/test-workspace/audit/{id:guid}"), Authorize]
     public async Task<IActionResult> Audit(Guid id, [FromServices] ComplianceDbContext db)

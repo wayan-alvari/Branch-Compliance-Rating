@@ -51,7 +51,7 @@ public sealed class WorkspaceLifecycle(ComplianceDbContext db, WorkspaceContext 
         if (workspace is not null)
         {
             files.RemoveWorkspace(workspace.WorkspaceId);
-            await db.Workspaces.Where(row => row.WorkspaceId == workspace.WorkspaceId).ExecuteDeleteAsync(cancellationToken);
+            await db.DeleteExpiredWorkspaceRowsAsync(workspace.WorkspaceId, cancellationToken);
             db.Entry(workspace).State = EntityState.Detached;
             coordinator.Forget(workspace.WorkspaceId);
         }
@@ -62,7 +62,15 @@ public sealed class WorkspaceLifecycle(ComplianceDbContext db, WorkspaceContext 
         context.Activate(newId);
         db.Workspaces.Add(new DemoWorkspace(newId, now, 1));
         await db.SaveChangesAsync(cancellationToken);
-        await seeder.SeedAsync(newId, cancellationToken);
+        try
+        {
+            await seeder.SeedAsync(newId, cancellationToken);
+        }
+        catch
+        {
+            files.RemoveWorkspace(newId);
+            throw;
+        }
         await transaction.CommitAsync(cancellationToken);
         await files.RecordActivityAsync(newId, now, cancellationToken);
         coordinator.Observe(newId, now);
@@ -80,7 +88,9 @@ public sealed class WorkspaceLifecycle(ComplianceDbContext db, WorkspaceContext 
             if (workspace.IsExpired(now, observed))
             {
                 files.RemoveWorkspace(workspace.WorkspaceId);
-                await db.Workspaces.Where(row => row.WorkspaceId == workspace.WorkspaceId).ExecuteDeleteAsync(cancellationToken);
+                await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
+                await db.DeleteExpiredWorkspaceRowsAsync(workspace.WorkspaceId, cancellationToken);
+                await transaction.CommitAsync(cancellationToken);
                 db.Entry(workspace).State = EntityState.Detached;
                 coordinator.Forget(workspace.WorkspaceId);
             }

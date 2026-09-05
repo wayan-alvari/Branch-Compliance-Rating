@@ -33,6 +33,7 @@ public partial class ComplianceDbContext(DbContextOptions<ComplianceDbContext> o
         builder.Entity<AuditEvent>().Property(row => row.Action).HasMaxLength(100);
         builder.Entity<AuditEvent>().Property(row => row.Details).HasMaxLength(500);
         builder.Entity<AuditEvent>().HasIndex(row => new { row.WorkspaceId, row.AtUtc });
+        ConfigureComplianceModel(builder);
 
         foreach (var entity in builder.Model.GetEntityTypes())
         {
@@ -51,21 +52,35 @@ public partial class ComplianceDbContext(DbContextOptions<ComplianceDbContext> o
         entity.HasBaseType((Type?)null);
         entity.HasKey(row => row.Id);
         entity.Property(row => row.ChangeVersion).IsConcurrencyToken();
-        entity.HasIndex(row => new { row.WorkspaceId, row.Id }).IsUnique();
+        entity.HasAlternateKey(row => new { row.WorkspaceId, row.Id });
         entity.HasQueryFilter(row => row.WorkspaceId == CurrentWorkspaceId);
         entity.HasOne<DemoWorkspace>().WithMany().HasForeignKey(row => row.WorkspaceId).OnDelete(DeleteBehavior.Cascade);
     }
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
+        var owners = AppendPendingAudit();
         ValidateWorkspaceWrites();
-        return base.SaveChanges(acceptAllChangesOnSuccess);
+        var result = base.SaveChanges(acceptAllChangesOnSuccess);
+        foreach (var owner in owners) owner.ClearPendingAudit();
+        return result;
     }
 
-    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {
+        var owners = AppendPendingAudit();
         ValidateWorkspaceWrites();
-        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        foreach (var owner in owners) owner.ClearPendingAudit();
+        return result;
+    }
+
+    private WorkspaceEntity[] AppendPendingAudit()
+    {
+        var owners = ChangeTracker.Entries<WorkspaceEntity>().Select(entry => entry.Entity).Where(entity => entity.PendingAudit.Count > 0).ToArray();
+        foreach (var audit in owners.SelectMany(owner => owner.PendingAudit))
+            if (Entry(audit).State == EntityState.Detached) AuditEvents.Add(audit);
+        return owners;
     }
 
     private void ValidateWorkspaceWrites()
@@ -77,6 +92,7 @@ public partial class ComplianceDbContext(DbContextOptions<ComplianceDbContext> o
                 throw new UnauthorizedAccessException("The record does not belong to this workspace.");
             if (entry.Entity is AuditEvent && entry.State != EntityState.Added)
                 throw new InvalidOperationException("Audit history is immutable.");
+            ValidateImmutability(entry);
         }
     }
 

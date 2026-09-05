@@ -54,8 +54,8 @@ For an explicitly initialized, secret-free development demo:
 Open `http://localhost:5094`. This command enables Development and DemoMode and
 creates a local ignored SQLite database and four demo identities idempotently.
 SQLite is rejected outside Development. Production initialization never runs
-automatically. MySQL migration and setup instructions are added at the data
-checkpoint.
+automatically. See [MySQL setup and the optional local smoke test](Docs/DATABASE.md)
+for placeholder SQL, least-privilege users, connection configuration, and migrations.
 
 ## Demo roles
 

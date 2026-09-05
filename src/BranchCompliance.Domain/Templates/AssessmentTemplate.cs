@@ -83,7 +83,7 @@ public sealed class AssessmentTemplate : WorkspaceEntity
     public void SetBands(IEnumerable<RatingThreshold> bands, string actorId, DateTime now)
     {
         RequireDraft();
-        var rows = bands.ToArray();
+        var rows = bands.Select(row => new RatingThreshold(Rule.Text(row.Label, "Rating label", 60), row.MinimumInclusive)).ToArray();
         WeightedScoring.ValidateBands(rows);
         _bands.Clear();
         var order = 0;
@@ -108,7 +108,8 @@ public sealed class AssessmentTemplate : WorkspaceEntity
     {
         Rule.Require(State == TemplateState.Published, "Create a new version from a published template.");
         Rule.Require(nextVersion > Version, "The new version must be greater than the source version.");
-        var draft = new AssessmentTemplate(WorkspaceId, Name, Description, actorId, now) { FamilyId = FamilyId, Version = nextVersion };
+        var draft = new AssessmentTemplate { WorkspaceId = WorkspaceId, FamilyId = FamilyId, Version = nextVersion };
+        draft.Rename(Name, Description, actorId, now);
         var categoryIds = new Dictionary<Guid, Guid>();
         foreach (var category in _categories)
             categoryIds[category.Id] = draft.AddCategory(category.Name, category.Order, actorId, now).Id;
