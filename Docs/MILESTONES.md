@@ -18,7 +18,7 @@ ignored. No deployment, remote push, history rewrite, or Docker is authorized.
 | 4 | Domain, mappings/migration, synthetic seeds | Domain/persistence tests | `feat(data): model compliance assessments` | Complete |
 | 5 | Dashboards and work queues | View/controller tests | `feat(dashboard): show compliance workflow progress` | Complete |
 | 6 | Branches and template versions | Validation/authorization tests | `feat(templates): configure versioned criteria` | Complete |
-| 7 | Period snapshots, assignments, phases | Snapshot/transition tests | `feat(periods): open snapshotted assessment periods` | Pending |
+| 7 | Period snapshots, assignments, phases | Snapshot/transition tests | `feat(periods): open snapshotted assessment periods` | Complete |
 | 8 | Responses, protected evidence, submission | Branch/evidence tests | `feat(submissions): collect branch compliance evidence` | Pending |
 | 9 | Assessor scoring and weighted results | Decimal/scoring tests | `feat(scoring): calculate provisional branch ratings` | Pending |
 | 10 | Publication and criterion appeals | Window/appeal tests | `feat(appeals): add provisional result appeals` | Pending |
@@ -118,3 +118,12 @@ layout, browser errors, and clean working tree.
   cross-browser workspace isolation, historical branch snapshots, duplicate
   codes, unsafe deletion, and draft mutation rules are covered. EF tooling
   reports no pending model changes after recording explicit public-ID generation.
+- Milestone 7: formatting and Release build passed without warnings or errors;
+  27 unit tests and 36 SQLite integration tests passed. Administrator-only HTTP
+  coverage creates a UTC schedule from one published template, assigns an active
+  branch and Assessor, rejects duplicate assignments and an empty opening, opens
+  a period, and advances only after every submission is ready. Snapshot checks
+  compare source IDs, category/order, code, title, guidance, weight, evidence
+  rules, and rating bands. Role denial, cross-browser isolation, deadline order,
+  and premature transition errors are covered. The period page shows all phase
+  deadlines, assignment progress, readiness guidance, and the immutable snapshot.

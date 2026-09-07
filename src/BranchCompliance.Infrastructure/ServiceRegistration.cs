@@ -1,5 +1,6 @@
 using BranchCompliance.Application.Configuration;
 using BranchCompliance.Application.Dashboard;
+using BranchCompliance.Application.Periods;
 using BranchCompliance.Application.Security;
 using BranchCompliance.Application.Workspaces;
 using BranchCompliance.Infrastructure.Identity;
@@ -25,6 +26,8 @@ public static class ServiceRegistration
         services.AddScoped<DashboardService>();
         services.AddScoped<IConfigurationStore, ConfigurationStore>();
         services.AddScoped<ConfigurationService>();
+        services.AddScoped<IPeriodAdministrationStore, PeriodAdministrationStore>();
+        services.AddScoped<PeriodAdministrationService>();
         services.AddScoped<WorkspaceContext>();
         services.AddScoped<IWorkspaceContext>(provider => provider.GetRequiredService<WorkspaceContext>());
         services.AddSingleton<WorkspaceCoordinator>();

@@ -36,7 +36,7 @@ public sealed class WorkspaceSeeder(ComplianceDbContext db, IClock clock, UserMa
         var historical = new AssessmentPeriod(workspaceId, "Completed practice cycle", template, now.AddDays(-90),
             now.AddDays(-80), now.AddDays(-70), now.AddDays(-60), now.AddDays(-50), admin, now.AddDays(-90));
         var previous = branches.Select(branch => new BranchAssessment(historical, branch, assessor, admin, now.AddDays(-90))).ToArray();
-        historical.Open(template, admin, now.AddDays(-90));
+        historical.Open(template, previous, admin, now.AddDays(-90));
         foreach (var assessment in previous)
         {
             var responseActor = assessment.BranchUserId ?? "system";
@@ -65,7 +65,7 @@ public sealed class WorkspaceSeeder(ComplianceDbContext db, IClock clock, UserMa
         var current = new AssessmentPeriod(workspaceId, "Current practice cycle", template, now.AddDays(-2),
             now.AddDays(7), now.AddDays(14), now.AddDays(21), now.AddDays(28), admin, now.AddDays(-2));
         var active = branches.Select(branch => new BranchAssessment(current, branch, assessor, admin, now.AddDays(-2))).ToArray();
-        current.Open(template, admin, now.AddDays(-2));
+        current.Open(template, active, admin, now.AddDays(-2));
         for (var i = 0; i < active.Length; i++)
         {
             await RespondAsync(current, active[i], i == 0 ? branchUser : "system", now.AddDays(-1), all: i != 0, cancellationToken);

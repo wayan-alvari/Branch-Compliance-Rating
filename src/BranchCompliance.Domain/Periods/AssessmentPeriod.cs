@@ -45,8 +45,9 @@ public sealed class AssessmentPeriod : WorkspaceEntity
         Record(actorId, "Period created", now, "Draft period created from a published template.");
     }
 
-    public void Open(AssessmentTemplate template, string actorId, DateTime now)
+    public void Open(AssessmentTemplate template, IReadOnlyCollection<BranchAssessment> assessments, string actorId, DateTime now)
     {
+        RequireAssignments(assessments);
         RequireWindow(PeriodPhase.Draft, SubmissionDeadlineUtc, now);
         Rule.Require(template.Id == TemplateId && template.WorkspaceId == WorkspaceId && template.State == TemplateState.Published,
             "The selected published template is required.");

@@ -1,0 +1,31 @@
+@model IReadOnlyList<BranchCompliance.Domain.Periods.AssessmentPeriod>
+@{ ViewData["Title"] = "Assessment periods"; }
+<div class="d-flex justify-content-between align-items-center gap-3 mb-4 flex-wrap">
+    <p class="text-secondary mb-0">Schedule each practice cycle from one published template version.</p>
+    <a class="btn btn-primary" asp-action="Create">Create period</a>
+</div>
+<section class="card"><div class="card-body">
+@if (Model.Count == 0)
+{
+    <p class="mb-0">No assessment periods have been created.</p>
+}
+else
+{
+    <div class="table-responsive"><table class="table align-middle">
+        <caption class="visually-hidden">Assessment periods and current phases</caption>
+        <thead><tr><th>Period</th><th>Template</th><th>Phase</th><th>Opens</th><th>Finalization deadline</th></tr></thead>
+        <tbody>
+        @foreach (var period in Model)
+        {
+            <tr>
+                <td><a asp-action="Details" asp-route-id="@period.Id">@period.Name</a></td>
+                <td>@period.TemplateName <span class="text-secondary">v@period.TemplateVersion</span></td>
+                <td><span class="status-label">@period.Phase</span></td>
+                <td><time datetime="@period.OpensAtUtc.ToString("O")">@period.OpensAtUtc.ToString("dd MMM yyyy HH:mm 'UTC'")</time></td>
+                <td><time datetime="@period.FinalizationDeadlineUtc.ToString("O")">@period.FinalizationDeadlineUtc.ToString("dd MMM yyyy HH:mm 'UTC'")</time></td>
+            </tr>
+        }
+        </tbody>
+    </table></div>
+}
+</div></section>

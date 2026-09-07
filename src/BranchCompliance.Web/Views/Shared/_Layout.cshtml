@@ -45,6 +45,7 @@
                         {
                             <li class="nav-item"><a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Branches" ? "active" : "")" asp-controller="Branches" asp-action="Index">Branches</a></li>
                             <li class="nav-item"><a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Templates" ? "active" : "")" asp-controller="Templates" asp-action="Index">Assessment templates</a></li>
+                            <li class="nav-item"><a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Periods" ? "active" : "")" asp-controller="Periods" asp-action="Index">Assessment periods</a></li>
                         }
                         <li class="nav-item"><a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Account" ? "active" : "")" asp-controller="Account" asp-action="Login">Demo roles &amp; sign-in</a></li>
                     </ul>

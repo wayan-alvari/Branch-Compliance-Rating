@@ -18,7 +18,7 @@ public sealed class AssessmentWorkflowTests
             Now.AddDays(1), Now.AddDays(2), Now.AddDays(3), Now.AddDays(4), "admin", Now);
         var branch = new Branch(template.WorkspaceId, "DEMO-HP", "Harbor Point", "Coastal", "branch", "admin", Now);
         var assessment = new BranchAssessment(period, branch, "assessor", "admin", Now);
-        period.Open(template, "admin", Now);
+        period.Open(template, [assessment], "admin", Now);
         return (template, period, assessment);
     }
 
@@ -138,7 +138,7 @@ public sealed class AssessmentWorkflowTests
     [Fact]
     public void Snapshot_and_rating_bands_do_not_change_when_a_new_template_version_changes()
     {
-        var (template, period, _) = Scenario();
+        var (template, period, assessment) = Scenario();
         var snapshot = period.Criteria.First();
         var draft = template.NewVersion(2, "admin", Now);
         draft.UpdateCriterion(draft.Criteria.First().Id, "New title", "New guidance", 40m, true, 8, "admin", Now);
@@ -148,7 +148,7 @@ public sealed class AssessmentWorkflowTests
         Assert.False(snapshot.EvidenceRequired);
         Assert.Equal(4, period.Bands.Count);
         Assert.Equal(90m, period.Bands.Max(row => row.MinimumInclusive));
-        Assert.Throws<DomainRuleException>(() => period.Open(template, "admin", Now));
+        Assert.Throws<DomainRuleException>(() => period.Open(template, [assessment], "admin", Now));
     }
 
     [Fact]
@@ -180,5 +180,18 @@ public sealed class AssessmentWorkflowTests
         var branch = new Branch(period.WorkspaceId, "DEMO-NF", "Northfield", "Inland", null, "admin", Now);
         branch.Edit(branch.Name, branch.Region, false, "admin", Now);
         Assert.Throws<DomainRuleException>(() => new BranchAssessment(period, branch, "assessor", "admin", Now));
+    }
+
+    [Fact]
+    public void Draft_period_requires_an_assignment_before_it_can_snapshot_and_open()
+    {
+        var template = TemplateAndScoringTests.Template();
+        template.Publish("admin", Now);
+        var period = new AssessmentPeriod(template.WorkspaceId, "Unassigned practice", template, Now.AddHours(-1),
+            Now.AddDays(1), Now.AddDays(2), Now.AddDays(3), Now.AddDays(4), "admin", Now);
+
+        Assert.Throws<DomainRuleException>(() => period.Open(template, [], "admin", Now));
+        Assert.Empty(period.Criteria);
+        Assert.Equal(PeriodPhase.Draft, period.Phase);
     }
 }

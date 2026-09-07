@@ -1,0 +1,21 @@
+@model BranchCompliance.Web.Models.PeriodCreateForm
+@{ ViewData["Title"] = "Create assessment period"; }
+<div class="row"><div class="col-xl-8">
+<form method="post" class="card form-card"><div class="card-body">
+    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+    @if (Model.Templates.Count == 0)
+    {
+        <div class="alert alert-warning">Publish a valid <a asp-controller="Templates" asp-action="Index">assessment template</a> before creating a period.</div>
+    }
+    <div class="mb-3"><label asp-for="Name" class="form-label"></label><input asp-for="Name" class="form-control" autocomplete="off" /><span asp-validation-for="Name" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="TemplateId" class="form-label">Published template version</label><select asp-for="TemplateId" asp-items="Model.Templates" class="form-select"><option value="">Choose a template</option></select><span asp-validation-for="TemplateId" class="text-danger"></span><div class="form-text">The selected criteria and rating bands are copied when this period opens.</div></div>
+    <div class="row g-3">
+        <div class="col-md-6"><label asp-for="OpensAtUtc" class="form-label"></label><input asp-for="OpensAtUtc" type="datetime-local" class="form-control" step="60" /><span asp-validation-for="OpensAtUtc" class="text-danger"></span></div>
+        <div class="col-md-6"><label asp-for="SubmissionDeadlineUtc" class="form-label"></label><input asp-for="SubmissionDeadlineUtc" type="datetime-local" class="form-control" step="60" /><span asp-validation-for="SubmissionDeadlineUtc" class="text-danger"></span></div>
+        <div class="col-md-6"><label asp-for="AssessmentDeadlineUtc" class="form-label"></label><input asp-for="AssessmentDeadlineUtc" type="datetime-local" class="form-control" step="60" /><span asp-validation-for="AssessmentDeadlineUtc" class="text-danger"></span></div>
+        <div class="col-md-6"><label asp-for="AppealDeadlineUtc" class="form-label"></label><input asp-for="AppealDeadlineUtc" type="datetime-local" class="form-control" step="60" /><span asp-validation-for="AppealDeadlineUtc" class="text-danger"></span></div>
+        <div class="col-md-6"><label asp-for="FinalizationDeadlineUtc" class="form-label"></label><input asp-for="FinalizationDeadlineUtc" type="datetime-local" class="form-control" step="60" /><span asp-validation-for="FinalizationDeadlineUtc" class="text-danger"></span></div>
+    </div>
+    <p class="small text-secondary mt-3 mb-0">Enter all dates in UTC. Dates must increase strictly from opening through finalization.</p>
+</div><div class="card-footer bg-transparent d-flex gap-2"><button class="btn btn-primary" type="submit" @(Model.Templates.Count == 0 ? "disabled" : null)>Create draft period</button><a class="btn btn-outline-secondary" asp-action="Index">Cancel</a></div></form>
+</div></div>

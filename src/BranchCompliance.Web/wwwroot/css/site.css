@@ -46,4 +46,13 @@ a { color: #076762; }
 .criterion-preview { padding: 1rem 0; border-bottom: 1px solid #e3eaed; }
 .criterion-preview:first-child { padding-top: 0; }
 .criterion-preview:last-child { border-bottom: 0; padding-bottom: 0; }
+.deadline-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: .85rem; }
+.deadline-grid .card-body { display: flex; flex-direction: column; gap: .2rem; }
+.deadline-grid span, .deadline-grid small { color: var(--muted); }
+.deadline-grid strong { font-size: .95rem; }
+.snapshot-category { border-bottom: 1px solid var(--line); padding: .85rem 0; }
+.snapshot-category:first-child { padding-top: 0; }
+.snapshot-category li { display: grid; grid-template-columns: 5rem minmax(12rem, 1fr) auto auto; gap: 1rem; align-items: baseline; padding: .45rem 0; }
+.snapshot-category small { color: var(--muted); }
+@media (max-width: 767.98px) { .snapshot-category li { grid-template-columns: 4.5rem 1fr auto; } .snapshot-category small { grid-column: 2 / -1; } }
 @media (max-width: 575.98px) { .navbar-brand { font-size: 1rem; } .app-header .container-fluid { gap: .6rem; } .demo-notice { padding: .7rem 1rem; } }

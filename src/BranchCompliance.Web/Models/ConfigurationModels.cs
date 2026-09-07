@@ -54,3 +54,21 @@ public sealed class BandRow
     [Required, StringLength(60)] public string Label { get; set; } = "";
     [Range(typeof(decimal), "0", "100")] public decimal Minimum { get; set; }
 }
+
+public sealed class PeriodCreateForm
+{
+    [Required, StringLength(120)] public string Name { get; set; } = "";
+    [Required] public Guid? TemplateId { get; set; }
+    [Display(Name = "Opens at (UTC)")] public DateTime OpensAtUtc { get; set; }
+    [Display(Name = "Submission deadline (UTC)")] public DateTime SubmissionDeadlineUtc { get; set; }
+    [Display(Name = "Assessment deadline (UTC)")] public DateTime AssessmentDeadlineUtc { get; set; }
+    [Display(Name = "Appeal deadline (UTC)")] public DateTime AppealDeadlineUtc { get; set; }
+    [Display(Name = "Finalization deadline (UTC)")] public DateTime FinalizationDeadlineUtc { get; set; }
+    [BindNever] public IReadOnlyList<SelectListItem> Templates { get; set; } = [];
+}
+
+public sealed class PeriodAssignmentForm
+{
+    [Required] public Guid? BranchId { get; set; }
+    [Required] public string AssessorId { get; set; } = "";
+}

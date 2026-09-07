@@ -1,0 +1,93 @@
+@using BranchCompliance.Domain.Assessments
+@using BranchCompliance.Domain.Periods
+@model BranchCompliance.Application.Periods.PeriodAdministrationDetails
+@{
+    ViewData["Title"] = Model.Period.Name;
+    var period = Model.Period;
+    var assignments = Model.Assessments;
+    var canAssign = period.Phase is PeriodPhase.Draft or PeriodPhase.SubmissionOpen;
+    var nextLabel = period.Phase switch
+    {
+        PeriodPhase.SubmissionOpen => "Open assessment",
+        PeriodPhase.AssessmentOpen => "Publish provisional results",
+        PeriodPhase.AppealOpen => "Close appeal window",
+        _ => ""
+    };
+    var transitionReady = period.Phase switch
+    {
+        PeriodPhase.SubmissionOpen => assignments.Count > 0 && assignments.All(row => row.State == AssessmentState.Submitted),
+        PeriodPhase.AssessmentOpen => assignments.Count > 0 && assignments.All(row => row.State == AssessmentState.ProvisionallyScored),
+        PeriodPhase.AppealOpen => assignments.Count > 0,
+        _ => false
+    };
+}
+<section class="card mb-4"><div class="card-body">
+    <div class="d-flex justify-content-between gap-3 flex-wrap">
+        <div><span class="status-label">@period.Phase</span><p class="mt-3 mb-1">Template: <strong>@period.TemplateName</strong>, version @period.TemplateVersion</p><p class="text-secondary mb-0">@assignments.Count assigned branch@(assignments.Count == 1 ? "" : "es") · @period.Criteria.Count snapshotted criteria</p></div>
+        <div class="d-flex gap-2 align-items-start flex-wrap">
+        @if (period.Phase == PeriodPhase.Draft)
+        {
+            <form asp-action="Open" asp-route-id="@period.Id" method="post" data-confirm="Open this period and permanently copy the selected template version?"><button class="btn btn-primary" type="submit" disabled="@(assignments.Count == 0)">Open and snapshot</button></form>
+        }
+        else if (!string.IsNullOrEmpty(nextLabel))
+        {
+            <form asp-action="Advance" asp-route-id="@period.Id" method="post" data-confirm="Advance this period to its next phase?"><button class="btn btn-primary" type="submit" disabled="@(!transitionReady)">@nextLabel</button></form>
+        }
+        </div>
+    </div>
+    @if (period.Phase == PeriodPhase.Draft && assignments.Count == 0) { <p class="small text-danger mt-3 mb-0">Assign at least one branch before opening the period.</p> }
+    @if (!string.IsNullOrEmpty(nextLabel) && !transitionReady) { <p class="small text-secondary mt-3 mb-0">The next phase remains locked until every assigned assessment reaches the required state.</p> }
+</div></section>
+
+<section class="deadline-grid mb-4" aria-label="Period deadlines">
+    <article class="card"><div class="card-body"><span>Opens</span><strong><time datetime="@period.OpensAtUtc.ToString("O")">@period.OpensAtUtc.ToString("dd MMM yyyy HH:mm")</time></strong><small>UTC</small></div></article>
+    <article class="card"><div class="card-body"><span>Submissions</span><strong><time datetime="@period.SubmissionDeadlineUtc.ToString("O")">@period.SubmissionDeadlineUtc.ToString("dd MMM yyyy HH:mm")</time></strong><small>UTC deadline</small></div></article>
+    <article class="card"><div class="card-body"><span>Assessment</span><strong><time datetime="@period.AssessmentDeadlineUtc.ToString("O")">@period.AssessmentDeadlineUtc.ToString("dd MMM yyyy HH:mm")</time></strong><small>UTC deadline</small></div></article>
+    <article class="card"><div class="card-body"><span>Appeals</span><strong><time datetime="@period.AppealDeadlineUtc.ToString("O")">@period.AppealDeadlineUtc.ToString("dd MMM yyyy HH:mm")</time></strong><small>UTC deadline</small></div></article>
+    <article class="card"><div class="card-body"><span>Finalization</span><strong><time datetime="@period.FinalizationDeadlineUtc.ToString("O")">@period.FinalizationDeadlineUtc.ToString("dd MMM yyyy HH:mm")</time></strong><small>UTC deadline</small></div></article>
+</section>
+
+<section class="card mb-4"><div class="card-header bg-transparent"><h2 class="h5 mb-0">Branch assignments and progress</h2></div><div class="card-body">
+    @if (assignments.Count == 0) { <p>No branches are assigned yet.</p> }
+    else
+    {
+        <div class="table-responsive"><table class="table align-middle"><caption class="visually-hidden">Assigned branches and workflow states</caption><thead><tr><th>Branch</th><th>Region</th><th>Assessor</th><th>Submission</th><th>Scoring</th><th>Appeals</th><th>Status</th></tr></thead><tbody>
+        @foreach (var assessment in assignments)
+        {
+            var assessor = Model.Assessors.SingleOrDefault(row => row.Id == assessment.AssessorId)?.Email ?? "Assigned Assessor";
+            <tr><td><strong>@assessment.BranchName</strong><br /><span class="small text-secondary">@assessment.BranchCode</span></td><td>@assessment.Region</td><td>@assessor</td><td>@assessment.Responses.Count / @period.Criteria.Count</td><td>@assessment.Scores.Select(row => row.PeriodCriterionId).Distinct().Count() / @period.Criteria.Count</td><td>@assessment.Appeals.Count</td><td><span class="status-label">@assessment.State</span></td></tr>
+        }
+        </tbody></table></div>
+    }
+    @if (canAssign && Model.AvailableBranches.Count > 0 && Model.Assessors.Count > 0)
+    {
+        <form asp-action="Assign" asp-route-id="@period.Id" method="post" class="row g-3 align-items-end border-top pt-3 mt-3">
+            <div asp-validation-summary="All" class="text-danger col-12" role="alert"></div>
+            <div class="col-md-5"><label for="BranchId" class="form-label">Active branch</label><select id="BranchId" name="BranchId" class="form-select" required><option value="">Choose a branch</option>@foreach (var branch in Model.AvailableBranches) { <option value="@branch.Id">@branch.Name (@branch.Code)</option> }</select></div>
+            <div class="col-md-5"><label for="AssessorId" class="form-label">Assessor</label><select id="AssessorId" name="AssessorId" class="form-select" required><option value="">Choose an Assessor</option>@foreach (var assessor in Model.Assessors) { <option value="@assessor.Id">@assessor.Email</option> }</select></div>
+            <div class="col-md-2"><button class="btn btn-outline-primary w-100" type="submit">Assign</button></div>
+        </form>
+    }
+    else if (canAssign && Model.AvailableBranches.Count == 0) { <p class="small text-secondary border-top pt-3 mb-0">Every active branch is assigned to this period.</p> }
+</div></section>
+
+<section class="card"><div class="card-header bg-transparent"><h2 class="h5 mb-0">Period-owned template snapshot</h2></div><div class="card-body">
+@if (period.Phase == PeriodPhase.Draft)
+{
+    <p class="mb-0">Criteria and rating bands will be copied when the period opens. The copy will remain unchanged if a later template version is created.</p>
+}
+else
+{
+    @foreach (var category in period.Criteria.GroupBy(row => new { row.Category, row.CategoryOrder }).OrderBy(row => row.Key.CategoryOrder).ThenBy(row => row.Key.Category))
+    {
+        <section class="snapshot-category"><h3 class="h6">@category.Key.Category</h3><ul class="list-unstyled mb-0">
+        @foreach (var criterion in category.OrderBy(row => row.Order).ThenBy(row => row.Code))
+        {
+            <li><code>@criterion.Code</code> <span>@criterion.Title</span><strong>@criterion.Weight.ToString("F2")%</strong><small>@(criterion.EvidenceRequired ? "Evidence required" : "Evidence optional")</small></li>
+        }
+        </ul></section>
+    }
+    <h3 class="h6 mt-4">Rating bands</h3>
+    <div class="d-flex flex-wrap gap-2">@foreach (var band in period.Bands.OrderBy(row => row.Order)) { <span class="status-label">@band.Label ≥ @band.MinimumInclusive.ToString("F2")</span> }</div>
+}
+</div></section>
