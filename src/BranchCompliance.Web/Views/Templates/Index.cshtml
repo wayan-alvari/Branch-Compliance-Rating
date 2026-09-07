@@ -1,0 +1,16 @@
+@model IReadOnlyList<BranchCompliance.Domain.Templates.AssessmentTemplate>
+@{ ViewData["Title"] = "Assessment templates"; }
+<div class="d-flex justify-content-between align-items-center gap-3 mb-4 flex-wrap"><p class="text-secondary mb-0">Build generic criteria with exact weights and clear rating bands.</p><a class="btn btn-primary" asp-action="Create">Create template</a></div>
+<section class="card"><div class="card-body">
+@if (Model.Count == 0) { <p>No templates are configured. Create a draft to begin.</p> }
+else
+{
+    <div class="table-responsive"><table class="table align-middle"><caption class="visually-hidden">Versioned templates</caption><thead><tr><th>Template</th><th>Version</th><th>Status</th><th>Criteria</th><th>Total weight</th></tr></thead><tbody>
+    @foreach (var template in Model)
+    {
+        <tr><td><a asp-action="Details" asp-route-id="@template.Id">@template.Name</a></td><td>@template.Version</td><td><span class="status-label">@template.State</span></td><td>@template.Criteria.Count</td><td>@template.Criteria.Sum(row => row.Weight).ToString("F2")%</td></tr>
+    }
+    </tbody></table></div>
+}
+<p class="small text-secondary mb-0">Publishing fixes a version. Later changes use a new draft and never alter existing period criteria.</p>
+</div></section>

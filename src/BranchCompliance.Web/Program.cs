@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Threading.RateLimiting;
 using BranchCompliance.Application.Security;
 using BranchCompliance.Infrastructure;
@@ -7,6 +8,7 @@ using BranchCompliance.Web.Filters;
 using BranchCompliance.Web.Middleware;
 using BranchCompliance.Web.Security;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +19,13 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Services.AddComplianceInfrastructure(builder.Configuration, builder.Environment);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentActor, HttpCurrentActor>();
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var english = new CultureInfo("en-US");
+    options.DefaultRequestCulture = new RequestCulture(english);
+    options.SupportedCultures = [english];
+    options.SupportedUICultures = [english];
+});
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
@@ -85,6 +94,7 @@ app.Use(async (context, next) =>
     await next();
 });
 app.UseStaticFiles();
+app.UseRequestLocalization();
 app.UseRouting();
 app.UseAuthentication();
 app.UseMiddleware<DemoWorkspaceMiddleware>();

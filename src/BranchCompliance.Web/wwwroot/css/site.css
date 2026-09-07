@@ -42,4 +42,8 @@ a { color: #076762; }
 .activity-list { list-style: none; padding-left: 1rem; margin-bottom: 0; border-left: 2px solid #dce9e9; }
 .activity-list li { padding: 0 0 1rem .4rem; font-size: .9rem; }
 .activity-list li:last-child { padding-bottom: 0; }
+.form-page { max-width: 850px; }
+.criterion-preview { padding: 1rem 0; border-bottom: 1px solid #e3eaed; }
+.criterion-preview:first-child { padding-top: 0; }
+.criterion-preview:last-child { border-bottom: 0; padding-bottom: 0; }
 @media (max-width: 575.98px) { .navbar-brand { font-size: 1rem; } .app-header .container-fluid { gap: .6rem; } .demo-notice { padding: .7rem 1rem; } }

@@ -63,6 +63,38 @@ public sealed class AssessmentTemplate : WorkspaceEntity
         return criterion;
     }
 
+    public void UpdateCategory(Guid categoryId, string name, int order, string actorId, DateTime now)
+    {
+        RequireDraft();
+        name = Rule.Text(name, "Category name", 100);
+        Rule.Require(order >= 0 && order <= 999, "Display order must be between 0 and 999.");
+        var category = _categories.SingleOrDefault(row => row.Id == categoryId);
+        Rule.Require(category is not null, "Category not found in this template.");
+        Rule.Require(!_categories.Any(row => row.Id != categoryId && row.Name.Equals(name, StringComparison.OrdinalIgnoreCase)), "Category names must be unique.");
+        category!.Update(name, order);
+        Record(actorId, "Template category updated", now, "Draft category updated.");
+    }
+
+    public void RemoveCategory(Guid categoryId, string actorId, DateTime now)
+    {
+        RequireDraft();
+        Rule.Require(!_criteria.Any(row => row.CategoryId == categoryId), "Move or remove the category's draft criteria first.");
+        Rule.Require(_categories.RemoveAll(row => row.Id == categoryId) == 1, "Category not found in this template.");
+        Record(actorId, "Draft category removed", now, "An empty draft category was removed.");
+    }
+
+    public void EditCriterion(Guid criterionId, Guid categoryId, string code, string title, string guidance, decimal weight,
+        bool evidenceRequired, int order, string actorId, DateTime now)
+    {
+        RequireDraft();
+        Rule.Require(_categories.Any(row => row.Id == categoryId), "Choose a category from this template.");
+        code = Rule.Text(code, "Criterion code", 24).ToUpperInvariant();
+        Rule.Require(code.All(character => char.IsAsciiLetterOrDigit(character) || character == '-'), "Criterion codes use English letters, digits, and hyphens only.");
+        Rule.Require(!_criteria.Any(row => row.Id != criterionId && row.Code == code), "Criterion codes must be unique.");
+        UpdateCriterion(criterionId, title, guidance, weight, evidenceRequired, order, actorId, now);
+        _criteria.Single(row => row.Id == criterionId).Reidentify(categoryId, code);
+    }
+
     public void UpdateCriterion(Guid criterionId, string title, string guidance, decimal weight, bool evidenceRequired,
         int order, string actorId, DateTime now)
     {

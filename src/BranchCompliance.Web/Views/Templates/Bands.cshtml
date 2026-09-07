@@ -1,0 +1,14 @@
+@model BandsForm
+@{ ViewData["Title"] = "Edit rating bands"; }
+<section class="card form-page"><div class="card-body p-4"><p>Use unique labels and minimum scores. Include a minimum of 0.00 so every valid score receives a rating.</p>
+<form asp-action="Bands" method="post">
+    <div asp-validation-summary="All" class="text-danger" role="alert"></div><input asp-for="TemplateId" type="hidden" />
+    <div id="rating-band-rows">
+    @for (var i = 0; i < Model.Bands.Count; i++)
+    {
+        <div class="row g-2 align-items-end mb-3 band-row"><div class="col-sm-6"><label asp-for="Bands[i].Label" class="form-label">Rating label</label><input asp-for="Bands[i].Label" class="form-control" maxlength="60" required /></div><div class="col-sm-4"><label asp-for="Bands[i].Minimum" class="form-label">Minimum score</label><input asp-for="Bands[i].Minimum" class="form-control" type="number" min="0" max="100" step="0.01" required /></div><div class="col-sm-2"><button class="btn btn-outline-danger remove-band" type="button">Remove</button></div></div>
+    }
+    </div>
+    <button id="add-rating-band" class="btn btn-outline-secondary mb-4" type="button">Add rating band</button>
+    <div><button class="btn btn-primary" type="submit">Save bands</button><a class="btn btn-outline-secondary" asp-action="Details" asp-route-id="@Model.TemplateId">Cancel</a></div>
+</form></div></section>

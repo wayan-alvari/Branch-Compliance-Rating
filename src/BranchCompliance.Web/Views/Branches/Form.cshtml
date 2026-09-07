@@ -1,0 +1,18 @@
+@model BranchForm
+@{ ViewData["Title"] = Model.Id is null ? "Create branch" : "Edit branch"; }
+<section class="card form-page"><div class="card-body p-4">
+<form asp-action="@(Model.Id is null ? "Create" : "Edit")" asp-route-id="@Model.Id" method="post">
+    <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+    <input asp-for="Id" type="hidden" />
+    <div class="mb-3"><label asp-for="Code" class="form-label">Branch code</label><input asp-for="Code" class="form-control" readonly="@(Model.Id is not null)" maxlength="24" required /><p class="form-text">Use an original fictional code. Codes remain fixed after creation.</p></div>
+    <div class="mb-3"><label asp-for="Name" class="form-label">Branch name</label><input asp-for="Name" class="form-control" maxlength="120" required /></div>
+    <div class="mb-3"><label asp-for="Region" class="form-label">Region label</label><input asp-for="Region" class="form-control" maxlength="80" required /></div>
+    <div class="form-check mb-3"><input asp-for="AssignDemoUser" class="form-check-input" /><label asp-for="AssignDemoUser" class="form-check-label">Let the demo Branch User complete this branch in future periods</label></div>
+    @if (Model.Id is not null)
+    {
+        <div class="form-check mb-3"><input asp-for="IsActive" class="form-check-input" /><label asp-for="IsActive" class="form-check-label">Active for future assignments</label></div>
+        <p class="small text-secondary">These changes apply to future assignments. Existing assessments keep their recorded branch details and assigned user.</p>
+    }
+    <div class="d-flex gap-2"><button class="btn btn-primary" type="submit">Save branch</button><a class="btn btn-outline-secondary" asp-action="Index">Cancel</a></div>
+</form>
+</div></section>

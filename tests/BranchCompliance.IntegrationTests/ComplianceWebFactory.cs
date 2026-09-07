@@ -76,6 +76,12 @@ public sealed class ComplianceWebFactory : WebApplicationFactory<Program>
         }));
     }
 
+    public static async Task<HttpResponseMessage> PostAsync(HttpClient browser, string formPage, string target, Dictionary<string, string> fields)
+    {
+        fields["__RequestVerificationToken"] = await TokenAsync(browser, formPage);
+        return await browser.PostAsync(target, new FormUrlEncodedContent(fields));
+    }
+
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);

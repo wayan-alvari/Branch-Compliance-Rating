@@ -17,7 +17,7 @@ ignored. No deployment, remote push, history rewrite, or Docker is authorized.
 | 3 | Workspace scope and six-hour reset | Isolation/reset tests | `feat(demo): isolate compliance workspaces` | Complete |
 | 4 | Domain, mappings/migration, synthetic seeds | Domain/persistence tests | `feat(data): model compliance assessments` | Complete |
 | 5 | Dashboards and work queues | View/controller tests | `feat(dashboard): show compliance workflow progress` | Complete |
-| 6 | Branches and template versions | Validation/authorization tests | `feat(templates): configure versioned criteria` | Pending |
+| 6 | Branches and template versions | Validation/authorization tests | `feat(templates): configure versioned criteria` | Complete |
 | 7 | Period snapshots, assignments, phases | Snapshot/transition tests | `feat(periods): open snapshotted assessment periods` | Pending |
 | 8 | Responses, protected evidence, submission | Branch/evidence tests | `feat(submissions): collect branch compliance evidence` | Pending |
 | 9 | Assessor scoring and weighted results | Decimal/scoring tests | `feat(scoring): calculate provisional branch ratings` | Pending |
@@ -31,8 +31,8 @@ ignored. No deployment, remote push, history rewrite, or Docker is authorized.
 
 - Installed: .NET SDK 8.0.407 and 10.0.400; Node 22.14.0; npm 10.9.2;
   Git 2.46.0.windows.1; MySQL 8.0.46 with MySQL80 running.
-- Required SDK 8.0.424 is being prepared locally in ignored `.local/dotnet`;
-  its official SHA-512 must match before extraction/use.
+- Required SDK 8.0.424 is installed in ignored `.local/dotnet`; its official
+  archive SHA-512 was verified before extraction.
 - No connection-string environment variable was supplied. Normal tests will
   use SQLite in-memory. The optional MySQL workflow needs an owner's local
   least-privilege connection string; no password will be guessed or fabricated.
@@ -110,3 +110,11 @@ layout, browser errors, and clean working tree.
   unknown roles/wrong workspace queries fail, and unpublished values are hidden.
   Application actor/access services and centralized safe expected-error handling
   provide the authorization foundation for the remaining command pages.
+- Milestone 6: formatting and Release build passed without warnings or errors;
+  26 unit tests and 31 SQLite integration tests passed. Administrator-only HTTP
+  tests create, edit, deactivate, and assign branches; create and validate draft
+  categories, criteria, weights, and rating bands; publish an immutable version;
+  and create an independent successor draft. Role denial, crafted posts,
+  cross-browser workspace isolation, historical branch snapshots, duplicate
+  codes, unsafe deletion, and draft mutation rules are covered. EF tooling
+  reports no pending model changes after recording explicit public-ID generation.

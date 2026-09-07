@@ -185,7 +185,7 @@ public sealed class PersistenceTests
         Assert.Contains("`__ef_migrations_history`", historySql);
         Assert.Contains("`migration_id`", historySql);
         Assert.Contains("`product_version`", historySql);
-        Assert.Single(db.Database.GetMigrations());
+        Assert.Contains(db.Database.GetMigrations(), migration => migration.EndsWith("_InitialCompliance", StringComparison.Ordinal));
         Assert.False(db.Database.HasPendingModelChanges());
     }
 }

@@ -31,4 +31,10 @@ public sealed class TemplateCriterion : WorkspaceEntity
         EvidenceRequired = evidenceRequired;
         Order = order;
     }
+
+    internal void Reidentify(Guid categoryId, string code)
+    {
+        CategoryId = categoryId;
+        Code = code;
+    }
 }

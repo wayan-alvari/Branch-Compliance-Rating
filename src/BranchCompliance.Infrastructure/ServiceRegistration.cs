@@ -1,3 +1,4 @@
+using BranchCompliance.Application.Configuration;
 using BranchCompliance.Application.Dashboard;
 using BranchCompliance.Application.Security;
 using BranchCompliance.Application.Workspaces;
@@ -22,6 +23,8 @@ public static class ServiceRegistration
         services.AddSingleton<IClock, SystemClock>();
         services.AddScoped<IDashboardStore, DashboardStore>();
         services.AddScoped<DashboardService>();
+        services.AddScoped<IConfigurationStore, ConfigurationStore>();
+        services.AddScoped<ConfigurationService>();
         services.AddScoped<WorkspaceContext>();
         services.AddScoped<IWorkspaceContext>(provider => provider.GetRequiredService<WorkspaceContext>());
         services.AddSingleton<WorkspaceCoordinator>();

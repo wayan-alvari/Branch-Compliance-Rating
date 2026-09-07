@@ -28,4 +28,10 @@ public sealed class Branch : WorkspaceEntity
         IsActive = isActive;
         Record(actorId, "Branch updated", now, isActive ? "Branch is active." : "Branch is inactive.");
     }
+
+    public void AssignUser(string? userId, string actorId, DateTime now)
+    {
+        BranchUserId = string.IsNullOrWhiteSpace(userId) ? null : Rule.Text(userId, "Branch user", 128);
+        Record(actorId, "Branch user assignment updated", now, "The assignment applies to future periods.");
+    }
 }

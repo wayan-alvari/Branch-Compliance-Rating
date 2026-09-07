@@ -1,0 +1,8 @@
+@model CategoryForm
+@{ ViewData["Title"] = Model.Id is null ? "Add a category" : "Edit category"; }
+<section class="card form-page"><div class="card-body p-4"><form asp-action="Category" method="post">
+    <div asp-validation-summary="All" class="text-danger" role="alert"></div><input asp-for="TemplateId" type="hidden" /><input asp-for="Id" type="hidden" />
+    <div class="mb-3"><label asp-for="Name" class="form-label">Category name</label><input asp-for="Name" class="form-control" maxlength="100" required /></div>
+    <div class="mb-4"><label asp-for="Order" class="form-label">Display order</label><input asp-for="Order" class="form-control" type="number" min="0" max="999" required /></div>
+    <button class="btn btn-primary" type="submit">Save category</button><a class="btn btn-outline-secondary" asp-action="Details" asp-route-id="@Model.TemplateId">Cancel</a>
+</form></div></section>

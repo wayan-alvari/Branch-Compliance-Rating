@@ -25,8 +25,10 @@ public partial class ComplianceDbContext(DbContextOptions<ComplianceDbContext> o
         }
 
         builder.Entity<DemoWorkspace>().HasKey(row => row.WorkspaceId);
+        builder.Entity<DemoWorkspace>().Property(row => row.WorkspaceId).ValueGeneratedNever();
         builder.Entity<DemoWorkspace>().HasIndex(row => row.ExpiresAtUtc);
         builder.Entity<WorkspaceRedirect>().HasKey(row => row.WorkspaceId);
+        builder.Entity<WorkspaceRedirect>().Property(row => row.WorkspaceId).ValueGeneratedNever();
         builder.Entity<WorkspaceRedirect>().HasIndex(row => row.RetiredAtUtc);
         ConfigureWorkspaceEntity<AuditEvent>(builder);
         builder.Entity<AuditEvent>().Property(row => row.ActorId).HasMaxLength(128);
@@ -51,6 +53,7 @@ public partial class ComplianceDbContext(DbContextOptions<ComplianceDbContext> o
         entity.Ignore(row => row.PendingAudit);
         entity.HasBaseType((Type?)null);
         entity.HasKey(row => row.Id);
+        entity.Property(row => row.Id).ValueGeneratedNever();
         entity.Property(row => row.ChangeVersion).IsConcurrencyToken();
         entity.HasAlternateKey(row => new { row.WorkspaceId, row.Id });
         entity.HasQueryFilter(row => row.WorkspaceId == CurrentWorkspaceId);

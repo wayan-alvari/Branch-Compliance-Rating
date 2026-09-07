@@ -1,0 +1,8 @@
+@model TemplateForm
+@{ ViewData["Title"] = Model.Id is null ? "Create a draft template" : "Edit draft template"; }
+<section class="card form-page"><div class="card-body p-4"><form asp-action="@(Model.Id is null ? "Create" : "Edit")" asp-route-id="@Model.Id" method="post">
+    <div asp-validation-summary="All" class="text-danger" role="alert"></div><input asp-for="Id" type="hidden" />
+    <div class="mb-3"><label asp-for="Name" class="form-label">Template name</label><input asp-for="Name" class="form-control" maxlength="120" required /></div>
+    <div class="mb-4"><label asp-for="Description" class="form-label">Description</label><textarea asp-for="Description" class="form-control" rows="4" maxlength="1000"></textarea></div>
+    <button class="btn btn-primary" type="submit">Save draft</button><a class="btn btn-outline-secondary" asp-action="Index">Cancel</a>
+</form></div></section>

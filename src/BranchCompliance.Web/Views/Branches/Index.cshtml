@@ -1,0 +1,16 @@
+@model IReadOnlyList<BranchCompliance.Domain.Branches.Branch>
+@{ ViewData["Title"] = "Branches"; }
+<div class="d-flex justify-content-between align-items-center gap-3 mb-4 flex-wrap"><p class="text-secondary mb-0">Configure fictional branches and future Branch User assignments.</p><a class="btn btn-primary" asp-action="Create">Create branch</a></div>
+<section class="card"><div class="card-body">
+@if (Model.Count == 0) { <p class="text-secondary">No branches are configured. Create a fictional branch to begin.</p> }
+else
+{
+    <div class="table-responsive"><table class="table align-middle"><caption class="visually-hidden">Branch configuration</caption><thead><tr><th>Code</th><th>Branch</th><th>Region</th><th>Branch User</th><th>Status</th><th>Action</th></tr></thead><tbody>
+    @foreach (var branch in Model)
+    {
+        <tr><td><code>@branch.Code</code></td><td>@branch.Name</td><td>@branch.Region</td><td>@(branch.BranchUserId is null ? "Not assigned" : "Demo Branch User")</td><td><span class="status-label">@(branch.IsActive ? "Active" : "Inactive")</span></td><td><a asp-action="Edit" asp-route-id="@branch.Id">Edit <span class="visually-hidden">@branch.Name</span></a></td></tr>
+    }
+    </tbody></table></div>
+}
+<p class="small text-secondary mb-0">Deactivate a branch to prevent future assignments. Existing assessments retain their original branch details.</p>
+</div></section>

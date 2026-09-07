@@ -42,6 +42,8 @@ public sealed class TemplateAndScoringTests
         var criterion = published.Criteria.First();
         Assert.Throws<DomainRuleException>(() => published.Rename("Changed", "", "admin", Now));
         Assert.Throws<DomainRuleException>(() => published.UpdateCriterion(criterion.Id, "Changed", "Changed", 25m, true, 0, "admin", Now));
+        Assert.Throws<DomainRuleException>(() => published.RemoveCriterion(criterion.Id, "admin", Now));
+        Assert.Throws<DomainRuleException>(() => published.RemoveCategory(published.Categories.First().Id, "admin", Now));
         Assert.Throws<DomainRuleException>(() => published.SetBands(Bands, "admin", Now));
         var draft = published.NewVersion(2, "admin", Now);
         draft.UpdateCriterion(draft.Criteria.First().Id, "Revised readiness", "Independent new guidance.", 40m, true, 0, "admin", Now);
@@ -51,6 +53,31 @@ public sealed class TemplateAndScoringTests
         Assert.Equal(2, draft.Version);
         Assert.Equal(TemplateState.Draft, draft.State);
         Assert.DoesNotContain(draft.Criteria.First().Id, published.Criteria.Select(row => row.Id));
+    }
+
+    [Fact]
+    public void Draft_categories_and_criteria_can_be_reordered_moved_and_removed_safely()
+    {
+        var template = Template();
+        var originalCategory = template.Categories.Single();
+        var secondCategory = template.AddCategory("Record Keeping", 2, "admin", Now);
+        var criterion = template.Criteria.First();
+
+        template.UpdateCategory(originalCategory.Id, "Facility Preparation", 3, "admin", Now);
+        template.EditCriterion(criterion.Id, secondCategory.Id, "RK-01", "Record readiness",
+            "Describe a fictional record check.", 45m, true, 4, "admin", Now);
+
+        Assert.Equal("Facility Preparation", originalCategory.Name);
+        Assert.Equal(3, originalCategory.Order);
+        Assert.Equal(secondCategory.Id, criterion.CategoryId);
+        Assert.Equal("RK-01", criterion.Code);
+        Assert.Equal(45m, criterion.Weight);
+        Assert.Throws<DomainRuleException>(() => template.RemoveCategory(secondCategory.Id, "admin", Now));
+
+        template.RemoveCriterion(criterion.Id, "admin", Now);
+        template.RemoveCategory(secondCategory.Id, "admin", Now);
+        Assert.DoesNotContain(template.Criteria, row => row.Id == criterion.Id);
+        Assert.DoesNotContain(template.Categories, row => row.Id == secondCategory.Id);
     }
 
     [Fact]

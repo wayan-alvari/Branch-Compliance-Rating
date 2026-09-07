@@ -14,4 +14,10 @@ public sealed class TemplateCategory : WorkspaceEntity
         Name = name;
         Order = order;
     }
+
+    internal void Update(string name, int order)
+    {
+        Name = name;
+        Order = order;
+    }
 }
