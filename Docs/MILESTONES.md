@@ -21,7 +21,7 @@ ignored. No deployment, remote push, history rewrite, or Docker is authorized.
 | 7 | Period snapshots, assignments, phases | Snapshot/transition tests | `feat(periods): open snapshotted assessment periods` | Complete |
 | 8 | Responses, protected evidence, submission | Branch/evidence tests | `feat(submissions): collect branch compliance evidence` | Complete |
 | 9 | Assessor scoring and weighted results | Decimal/scoring tests | `feat(scoring): calculate provisional branch ratings` | Complete |
-| 10 | Publication and criterion appeals | Window/appeal tests | `feat(appeals): add provisional result appeals` | Pending |
+| 10 | Publication and criterion appeals | Window/appeal tests | `feat(appeals): add provisional result appeals` | Complete |
 | 11 | Appeal decisions and finalization | Authorization/finalization tests | `feat(approval): finalize appealed compliance results` | Pending |
 | 12 | Ranking, filters, exports, audit | Tie/filter/export tests | `feat(reports): publish compliance ratings and ranking` | Pending |
 | 13 | Security, errors, health, accessibility | All quality gates and workflow regression | `test: harden branch compliance application` | Pending |
@@ -148,3 +148,13 @@ layout, browser errors, and clean working tree.
   stored provisional result remains hidden from the Branch User in AssessmentOpen,
   premature publication fails, and the same result appears only after the
   Administrator advances all completed assessments into AppealOpen.
+- Milestone 10: formatting and Release build passed without warnings or errors;
+  29 unit tests and 50 SQLite integration tests passed. The Branch User sees an
+  owned provisional total, rating, criterion scores, notes, decimal contributions,
+  and the UTC appeal deadline only after publication. HTTP tests submit a required
+  reason and optional clarification, retain the original 60.00 score, reject a
+  duplicate criterion appeal, and persist pending state/audit history. Protected
+  appeal evidence uses the same inspected storage boundary, supports removal while
+  pending, and is downloadable in Branch, assigned Assessor, and Approver appeal
+  context. Tests cover the three-file limit, post-decision removal lock, unpublished
+  result hiding, all non-Branch command denials, and cross-browser isolation.

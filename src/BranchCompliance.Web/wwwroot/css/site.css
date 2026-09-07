@@ -71,4 +71,12 @@ a { color: #076762; }
 .score-number { font-size: 1.5rem; }
 .summary-score { display: block; color: var(--navy); font-family: Georgia, serif; font-size: 2.5rem; line-height: 1; }
 @media (max-width: 1199.98px) { .score-entry { border-left: 0; border-top: 1px solid var(--line); padding: 1rem 0 0; } }
+.appeal-panel { padding: 1.25rem; border-bottom: 1px solid var(--line); }
+.appeal-panel:last-child { border-bottom: 0; }
+.score-note, .appeal-record { background: var(--soft); border-radius: .6rem; padding: 1rem; overflow-wrap: anywhere; }
+.appeal-form summary { color: var(--navy); cursor: pointer; font-weight: 700; }
+.appeal-record dl { display: grid; grid-template-columns: 8rem minmax(0, 1fr); gap: .35rem 1rem; }
+.appeal-record dt { color: var(--muted); }
+.appeal-record dd { white-space: pre-wrap; }
+@media (max-width: 575.98px) { .appeal-record dl { grid-template-columns: 1fr; gap: .15rem; } .appeal-record dd { margin-bottom: .7rem; } }
 @media (max-width: 575.98px) { .navbar-brand { font-size: 1rem; } .app-header .container-fluid { gap: .6rem; } .demo-notice { padding: .7rem 1rem; } }

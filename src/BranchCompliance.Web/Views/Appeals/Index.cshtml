@@ -1,0 +1,18 @@
+@model IReadOnlyList<BranchCompliance.Application.Appeals.AppealListItem>
+@{ ViewData["Title"] = "Provisional results & appeals"; }
+<p class="text-secondary mb-4">Review published criterion scores for your branch. One appeal may be submitted per criterion while the appeal window is open.</p>
+<section class="card"><div class="card-body">
+@if (Model.Count == 0)
+{
+    <p class="mb-0">No provisional result is published for your branch right now.</p>
+}
+else
+{
+    <div class="table-responsive"><table class="table align-middle"><caption class="visually-hidden">Published provisional branch results</caption><thead><tr><th>Period</th><th>Branch</th><th>Phase</th><th>Provisional result</th><th>Appeals</th><th>Appeal deadline</th></tr></thead><tbody>
+    @foreach (var item in Model)
+    {
+        <tr><td><a asp-action="Details" asp-route-id="@item.AssessmentId">@item.PeriodName</a></td><td>@item.BranchName</td><td><span class="status-label">@WorkflowLabels.Phase(item.Phase)</span></td><td><strong>@item.ProvisionalScore.ToString("F2")</strong> · @item.ProvisionalRating</td><td>@item.AppealCount total · @item.PendingAppeals pending</td><td><time datetime="@item.AppealDeadlineUtc.ToString("O")">@item.AppealDeadlineUtc.ToString("dd MMM yyyy HH:mm") UTC</time></td></tr>
+    }
+    </tbody></table></div>
+}
+</div></section>

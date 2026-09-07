@@ -105,6 +105,18 @@ public sealed class BranchAssessment : WorkspaceEntity
         return file!;
     }
 
+    public EvidenceFile RemoveAppealEvidence(AssessmentPeriod period, Guid evidenceId, string actorId, DateTime now)
+    {
+        RequirePeriod(period);
+        period.RequireAppeal(now);
+        var file = _evidence.SingleOrDefault(row => row.Id == evidenceId && row.AppealId is not null);
+        Rule.Require(file is not null && _appeals.Any(row => row.Id == file.AppealId && row.Decision == AppealDecision.Pending),
+            "Pending appeal evidence was not found in this assessment.");
+        _evidence.Remove(file!);
+        Record(actorId, "Appeal evidence removed", now, "A protected appeal attachment was removed before decision.");
+        return file!;
+    }
+
     public void Submit(AssessmentPeriod period, string actorId, DateTime now)
     {
         RequireEditableSubmission(period, now);

@@ -1,0 +1,47 @@
+@using BranchCompliance.Domain.Assessments
+@model BranchCompliance.Application.Appeals.AppealDetails
+@{
+    ViewData["Title"] = $"{Model.Assessment.BranchName} provisional result";
+    var period = Model.Period;
+    var assessment = Model.Assessment;
+}
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+<section class="card mb-4"><div class="card-body">
+    <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap"><div><span class="status-label">@WorkflowLabels.Phase(period.Phase)</span><h2 class="h4 mt-3 mb-1">@period.Name</h2><p class="text-secondary mb-0">@assessment.BranchCode · @assessment.Region</p></div><div class="text-end"><span class="small text-secondary d-block">Published provisional result</span><strong class="summary-score">@assessment.ProvisionalScore!.Value.ToString("F2")</strong><span>@assessment.ProvisionalRating</span></div></div>
+    <p class="small text-secondary mt-3 mb-0"><code>Overall = sum(score × weight / 100)</code>. The final sum uses two decimal places and midpoint rounding away from zero.</p>
+    <p class="small @(Model.CanAppeal ? "text-secondary" : "text-danger") mt-2 mb-0"><time datetime="@period.AppealDeadlineUtc.ToString("O")">Appeal deadline: @period.AppealDeadlineUtc.ToString("dd MMM yyyy HH:mm") UTC</time>. @(Model.CanAppeal ? "The appeal window is open." : "The appeal window is closed.")</p>
+</div></section>
+
+@foreach (var category in Model.Criteria.GroupBy(row => new { row.Criterion.Category, row.Criterion.CategoryOrder }))
+{
+    <section class="card mb-4"><div class="card-header bg-transparent"><h2 class="h5 mb-0">@category.Key.Category</h2></div><div class="card-body p-0">
+    @foreach (var row in category)
+    {
+        <article class="appeal-panel">
+            <div class="d-flex justify-content-between gap-3 flex-wrap"><div><h3 class="h6 mb-1"><code>@row.Criterion.Code</code> · @row.Criterion.Title</h3><p class="small text-secondary mb-2">@row.Criterion.Guidance</p></div><div class="text-end"><strong class="score-number">@row.Score.Value.ToString("F2")</strong><span class="small text-secondary d-block">@row.Criterion.Weight.ToString("F2")% · contribution @row.Contribution.ToString("F4")</span></div></div>
+            @if (!string.IsNullOrEmpty(row.Score.Note)) { <p class="score-note"><strong>Assessor note:</strong> @row.Score.Note</p> }
+            @if (row.Appeal is null && Model.CanAppeal)
+            {
+                <details class="appeal-form mt-3"><summary>Appeal this criterion</summary><form asp-action="Create" asp-route-id="@assessment.Id" method="post" class="mt-3">
+                    <input type="hidden" name="CriterionId" value="@row.Criterion.Id" />
+                    <div class="mb-3"><label class="form-label" for="reason-@row.Criterion.Id">Appeal reason</label><textarea class="form-control" id="reason-@row.Criterion.Id" name="Reason" rows="4" maxlength="2000" required></textarea></div>
+                    <div class="mb-3"><label class="form-label" for="clarification-@row.Criterion.Id">Optional clarification</label><textarea class="form-control" id="clarification-@row.Criterion.Id" name="Clarification" rows="3" maxlength="2000"></textarea></div>
+                    <button class="btn btn-outline-primary btn-sm" type="submit">Submit criterion appeal</button>
+                </form></details>
+            }
+            else if (row.Appeal is { } appeal)
+            {
+                <section class="appeal-record mt-3" aria-label="Appeal for @row.Criterion.Code"><div class="d-flex justify-content-between gap-2 flex-wrap"><h4 class="h6">Criterion appeal</h4><span class="status-label">@appeal.Decision</span></div><dl><dt>Original score</dt><dd>@appeal.OriginalScore.ToString("F2")</dd><dt>Reason</dt><dd>@appeal.Reason</dd><dt>Clarification</dt><dd>@(string.IsNullOrEmpty(appeal.Clarification) ? "No additional clarification." : appeal.Clarification)</dd>@if (appeal.Decision != AppealDecision.Pending) { <dt>Decision note</dt><dd>@appeal.DecisionNote</dd><dt>Revised score</dt><dd>@(appeal.RevisedScore?.ToString("F2") ?? "Original retained")</dd> }</dl>
+                    <h5 class="small fw-semibold">Appeal evidence <span class="text-secondary fw-normal">(@row.Evidence.Count / 3)</span></h5>
+                    @if (row.Evidence.Count == 0) { <p class="small text-secondary">No appeal evidence attached.</p> }
+                    <ul class="list-unstyled">@foreach (var file in row.Evidence) { <li class="d-flex gap-2 align-items-center flex-wrap"><a asp-controller="Evidence" asp-action="Download" asp-route-id="@file.Id">@file.OriginalName</a><span class="small text-secondary">@((file.Length / 1024m).ToString("F1")) KB</span>@if (Model.CanAppeal && appeal.Decision == AppealDecision.Pending) { <form asp-action="RemoveEvidence" asp-route-id="@assessment.Id" method="post" data-confirm="Remove this pending appeal evidence?"><input type="hidden" name="evidenceId" value="@file.Id" /><button class="btn btn-link text-danger btn-sm p-0" type="submit">Remove</button></form> }</li> }</ul>
+                    @if (Model.CanAppeal && appeal.Decision == AppealDecision.Pending && row.Evidence.Count < 3)
+                    {
+                        <form asp-action="Upload" asp-route-id="@assessment.Id" method="post" enctype="multipart/form-data" class="d-flex gap-2 align-items-end flex-wrap"><input type="hidden" name="appealId" value="@appeal.Id" /><div><label class="form-label small" for="appeal-file-@appeal.Id">Attach PDF, JPEG, or PNG</label><input class="form-control form-control-sm" id="appeal-file-@appeal.Id" name="file" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required /></div><button class="btn btn-outline-secondary btn-sm" type="submit">Upload</button></form>
+                    }
+                </section>
+            }
+        </article>
+    }
+    </div></section>
+}

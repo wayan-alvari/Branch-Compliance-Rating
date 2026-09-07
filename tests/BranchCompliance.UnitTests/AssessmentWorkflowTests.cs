@@ -212,4 +212,30 @@ public sealed class AssessmentWorkflowTests
         Assert.Throws<DomainRuleException>(() => assessment.AddEvidence(period, fourth, "branch", Now));
         Assert.Equal(3, assessment.Evidence.Count);
     }
+
+    [Fact]
+    public void Pending_appeal_evidence_is_limited_and_removable_only_before_decision()
+    {
+        var (_, period, assessment) = Scenario();
+        Submit(period, assessment);
+        Score(period, assessment);
+        period.Advance([assessment], "admin", Now);
+        var appeal = assessment.SubmitAppeal(period, period.Criteria.First().Id,
+            "Please review this fictional criterion.", "Additional generic context.", "branch", Now);
+        for (var index = 0; index < 3; index++)
+        {
+            assessment.AddEvidence(period, new EvidenceFile(period.WorkspaceId, assessment.Id, null, appeal.Id,
+                $"appeal-{index}.pdf", "application/pdf", 10, new string('C', 64), "branch", Now), "branch", Now);
+        }
+
+        var fourth = new EvidenceFile(period.WorkspaceId, assessment.Id, null, appeal.Id,
+            "appeal-4.pdf", "application/pdf", 10, new string('D', 64), "branch", Now);
+        Assert.Throws<DomainRuleException>(() => assessment.AddEvidence(period, fourth, "branch", Now));
+        var removed = assessment.RemoveAppealEvidence(period,
+            assessment.Evidence.First(row => row.AppealId == appeal.Id).Id, "branch", Now);
+        Assert.DoesNotContain(removed, assessment.Evidence);
+        assessment.DecideAppeal(period, appeal.Id, false, "The original score remains supported.", null, "approver", Now);
+        Assert.Throws<DomainRuleException>(() => assessment.RemoveAppealEvidence(period,
+            assessment.Evidence.First(row => row.AppealId == appeal.Id).Id, "branch", Now));
+    }
 }
