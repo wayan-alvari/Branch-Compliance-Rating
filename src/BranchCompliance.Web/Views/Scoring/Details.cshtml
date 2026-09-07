@@ -1,0 +1,58 @@
+@using BranchCompliance.Domain.Assessments
+@model BranchCompliance.Application.Scoring.ScoringDetails
+@{
+    ViewData["Title"] = $"Score {Model.Assessment.BranchName}";
+    var period = Model.Period;
+    var assessment = Model.Assessment;
+    var scoreLabel = period.Phase switch
+    {
+        PeriodPhase.Finalized => "Final weighted result",
+        PeriodPhase.FinalReview => "Current review total",
+        PeriodPhase.AppealOpen => "Published provisional result",
+        _ => "Draft weighted preview"
+    };
+}
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+<section class="card mb-4"><div class="card-body">
+    <div class="d-flex justify-content-between gap-3 flex-wrap"><div><span class="status-label">@WorkflowLabels.Assessment(assessment.State)</span><h2 class="h4 mt-3 mb-1">@period.Name</h2><p class="text-secondary mb-0">@assessment.BranchCode · @assessment.Region</p></div><div class="text-end"><strong class="d-block">@Model.Criteria.Count(row => row.LatestScore is not null) / @Model.Criteria.Count scored</strong><time class="small text-secondary" datetime="@period.AssessmentDeadlineUtc.ToString("O")">Due @period.AssessmentDeadlineUtc.ToString("dd MMM yyyy HH:mm") UTC</time></div></div>
+    @if (period.Phase == PeriodPhase.SubmissionOpen) { <p class="small text-secondary mt-3 mb-0">Scoring opens after the Administrator closes submissions.</p> }
+    else if (!Model.CanEdit && assessment.State == AssessmentState.Submitted) { <p class="small text-danger mt-3 mb-0">Scoring is outside its active phase or UTC window.</p> }
+    else if (assessment.State != AssessmentState.Submitted) { <p class="small text-secondary mt-3 mb-0">Completed scoring is immutable. Accepted appeals can add a separately attributed score revision later.</p> }
+</div></section>
+
+@foreach (var category in Model.Criteria.GroupBy(row => new { row.Criterion.Category, row.Criterion.CategoryOrder }))
+{
+    <section class="card mb-4"><div class="card-header bg-transparent"><h2 class="h5 mb-0">@category.Key.Category</h2></div><div class="card-body p-0">
+    @foreach (var row in category)
+    {
+        <article class="score-panel">
+            <div class="d-flex justify-content-between gap-3"><div><h3 class="h6 mb-1"><code>@row.Criterion.Code</code> · @row.Criterion.Title</h3><p class="small text-secondary">@row.Criterion.Guidance</p></div><strong class="text-nowrap">@row.Criterion.Weight.ToString("F2")%</strong></div>
+            <div class="row g-3">
+                <div class="col-xl-7"><section class="review-response"><h4 class="h6">Branch response</h4><p>@(string.IsNullOrWhiteSpace(row.Response?.Answer) ? "No response recorded." : row.Response.Answer)</p>@if (!string.IsNullOrWhiteSpace(row.Response?.Comment)) { <p class="small text-secondary">Comment: @row.Response.Comment</p> }
+                    <h5 class="small fw-semibold">Evidence</h5>@if (row.Evidence.Count == 0) { <p class="small text-secondary mb-0">No evidence attached.</p> } else { <ul class="list-unstyled mb-0">@foreach (var file in row.Evidence) { <li><a asp-controller="Evidence" asp-action="Download" asp-route-id="@file.Id">@file.OriginalName</a> <span class="small text-secondary">(@((file.Length / 1024m).ToString("F1")) KB)</span></li> }</ul> }
+                </section></div>
+                <div class="col-xl-5"><section class="score-entry"><h4 class="h6">Criterion score</h4>
+                @if (row.LatestScore is not null) { <p class="mb-2"><strong class="score-number">@row.LatestScore.Value.ToString("F2")</strong> <span class="small text-secondary">revision @row.LatestScore.Revision · contribution @row.Contribution!.Value.ToString("F4")</span></p><p class="small">@(string.IsNullOrEmpty(row.LatestScore.Note) ? "No score note." : row.LatestScore.Note)</p> }
+                else { <p class="small text-secondary">No score saved.</p> }
+                @if (Model.CanEdit)
+                {
+                    <form asp-action="Save" asp-route-id="@assessment.Id" method="post">
+                        <input type="hidden" name="CriterionId" value="@row.Criterion.Id" />
+                        <div class="mb-2"><label class="form-label" for="score-@row.Criterion.Id">Score (0.00–100.00)</label><input class="form-control" id="score-@row.Criterion.Id" name="Score" type="number" min="0" max="100" step="0.01" value="@row.LatestScore?.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)" required /></div>
+                        <div class="mb-2"><label class="form-label" for="note-@row.Criterion.Id">Score note</label><textarea class="form-control" id="note-@row.Criterion.Id" name="Note" rows="3" maxlength="2000">@row.LatestScore?.Note</textarea><div class="form-text">Required when the score is below 70.00.</div></div>
+                        <button class="btn btn-outline-primary btn-sm" type="submit">@(row.LatestScore is null ? "Save draft score" : "Save new revision")</button>
+                    </form>
+                }
+                </section></div>
+            </div>
+        </article>
+    }
+    </div></section>
+}
+
+<section class="card score-summary"><div class="card-body">
+    <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap"><div><h2 class="h5 mb-1">Weighted score summary</h2><p class="small text-secondary mb-0"><code>Contribution = score × (weight / 100)</code><br /><code>Overall = sum of contributions</code>. Only the final total is rounded to two decimals, midpoint away from zero.</p></div>
+    @if (Model.DraftTotal is not null) { <div class="text-end"><span class="small text-secondary d-block">@scoreLabel</span><strong class="summary-score">@Model.DraftTotal.Value.ToString("F2")</strong><span class="d-block">@Model.DraftRating</span></div> } else { <span class="status-label">Complete all criteria</span> }</div>
+    @if (Model.CanEdit) { <form asp-action="Complete" asp-route-id="@assessment.Id" method="post" class="mt-4" data-confirm="Complete scoring? Draft score revisions will become the provisional result."><button class="btn btn-primary" type="submit" disabled="@(!Model.CanComplete)">Complete scoring</button></form> }
+    @if (assessment.State == AssessmentState.ProvisionallyScored && !Model.ProvisionalPublished) { <p class="small text-secondary mt-3 mb-0">The provisional result is prepared but remains hidden from the Branch User until the Administrator publishes all period results.</p> }
+</div></section>

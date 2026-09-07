@@ -63,4 +63,12 @@ a { color: #076762; }
 .response-readonly dd { white-space: pre-wrap; overflow-wrap: anywhere; }
 .evidence-area { border-left: .2rem solid var(--line); padding-left: 1rem; }
 @media (max-width: 575.98px) { .response-readonly { grid-template-columns: 1fr; gap: .2rem; } .response-readonly dd { margin-bottom: .75rem; } }
+.score-panel { padding: 1.25rem; border-bottom: 1px solid var(--line); }
+.score-panel:last-child { border-bottom: 0; }
+.review-response { background: var(--soft); border-radius: .6rem; padding: 1rem; height: 100%; overflow-wrap: anywhere; }
+.review-response p { white-space: pre-wrap; }
+.score-entry { border-left: 1px solid var(--line); padding-left: 1rem; height: 100%; }
+.score-number { font-size: 1.5rem; }
+.summary-score { display: block; color: var(--navy); font-family: Georgia, serif; font-size: 2.5rem; line-height: 1; }
+@media (max-width: 1199.98px) { .score-entry { border-left: 0; border-top: 1px solid var(--line); padding: 1rem 0 0; } }
 @media (max-width: 575.98px) { .navbar-brand { font-size: 1rem; } .app-header .container-fluid { gap: .6rem; } .demo-notice { padding: .7rem 1rem; } }

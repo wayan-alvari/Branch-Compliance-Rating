@@ -1,6 +1,7 @@
 using BranchCompliance.Application.Configuration;
 using BranchCompliance.Application.Dashboard;
 using BranchCompliance.Application.Periods;
+using BranchCompliance.Application.Scoring;
 using BranchCompliance.Application.Security;
 using BranchCompliance.Application.Submissions;
 using BranchCompliance.Application.Workspaces;
@@ -31,6 +32,8 @@ public static class ServiceRegistration
         services.AddScoped<PeriodAdministrationService>();
         services.AddScoped<ISubmissionStore, SubmissionStore>();
         services.AddScoped<SubmissionService>();
+        services.AddScoped<IScoringStore, ScoringStore>();
+        services.AddScoped<ScoringService>();
         services.AddScoped<WorkspaceContext>();
         services.AddScoped<IWorkspaceContext>(provider => provider.GetRequiredService<WorkspaceContext>());
         services.AddSingleton<WorkspaceCoordinator>();

@@ -51,6 +51,10 @@
                         {
                             <li class="nav-item"><a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Submissions" ? "active" : "")" asp-controller="Submissions" asp-action="Index">Branch submissions</a></li>
                         }
+                        @if (User.IsInRole(DemoRoles.Assessor))
+                        {
+                            <li class="nav-item"><a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Scoring" ? "active" : "")" asp-controller="Scoring" asp-action="Index">Assessment scoring</a></li>
+                        }
                         <li class="nav-item"><a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Account" ? "active" : "")" asp-controller="Account" asp-action="Login">Demo roles &amp; sign-in</a></li>
                     </ul>
                 </nav>

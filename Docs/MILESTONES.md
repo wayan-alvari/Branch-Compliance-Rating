@@ -20,7 +20,7 @@ ignored. No deployment, remote push, history rewrite, or Docker is authorized.
 | 6 | Branches and template versions | Validation/authorization tests | `feat(templates): configure versioned criteria` | Complete |
 | 7 | Period snapshots, assignments, phases | Snapshot/transition tests | `feat(periods): open snapshotted assessment periods` | Complete |
 | 8 | Responses, protected evidence, submission | Branch/evidence tests | `feat(submissions): collect branch compliance evidence` | Complete |
-| 9 | Assessor scoring and weighted results | Decimal/scoring tests | `feat(scoring): calculate provisional branch ratings` | Pending |
+| 9 | Assessor scoring and weighted results | Decimal/scoring tests | `feat(scoring): calculate provisional branch ratings` | Complete |
 | 10 | Publication and criterion appeals | Window/appeal tests | `feat(appeals): add provisional result appeals` | Pending |
 | 11 | Appeal decisions and finalization | Authorization/finalization tests | `feat(approval): finalize appealed compliance results` | Pending |
 | 12 | Ranking, filters, exports, audit | Tie/filter/export tests | `feat(reports): publish compliance ratings and ranking` | Pending |
@@ -138,3 +138,13 @@ layout, browser errors, and clean working tree.
   `sandbox`, and `nosniff` headers. Tests prove Branch User ownership, Assessor
   access only after submission, Administrator read-only recovery, restricted
   Approver context, cross-browser isolation, and storage outside `wwwroot`.
+- Milestone 9: formatting and Release build passed without warnings or errors;
+  28 unit tests and 44 SQLite integration tests passed. The Assessor-only queue
+  presents assigned responses and protected evidence beside criterion score and
+  note forms. Tests enforce the 0.00-100.00 range, two decimal places, a required
+  note below 70.00, complete-criterion readiness, assignment/workspace scope, and
+  immutable draft revisions (60.00 then 90.00). Ten 10% criteria produce a tested
+  81.00 / Good preview using decimal contributions and final-only rounding. The
+  stored provisional result remains hidden from the Branch User in AssessmentOpen,
+  premature publication fails, and the same result appears only after the
+  Administrator advances all completed assessments into AppealOpen.

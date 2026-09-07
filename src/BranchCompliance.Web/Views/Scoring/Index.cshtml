@@ -1,0 +1,18 @@
+@model IReadOnlyList<BranchCompliance.Application.Scoring.ScoringListItem>
+@{ ViewData["Title"] = "Assessment scoring"; }
+<p class="text-secondary mb-4">Review only your assigned branches. Every criterion needs a decimal score, and values below 70.00 need an explanatory note.</p>
+<section class="card"><div class="card-body">
+@if (Model.Count == 0)
+{
+    <p class="mb-0">No assessments are assigned to this Assessor account.</p>
+}
+else
+{
+    <div class="table-responsive"><table class="table align-middle"><caption class="visually-hidden">Assigned assessments and scoring progress</caption><thead><tr><th>Period</th><th>Branch</th><th>Phase</th><th>Status</th><th>Scored</th><th>Assessment deadline</th></tr></thead><tbody>
+    @foreach (var item in Model)
+    {
+        <tr><td>@item.PeriodName</td><td><a asp-action="Details" asp-route-id="@item.AssessmentId">@item.BranchName</a></td><td><span class="status-label">@WorkflowLabels.Phase(item.Phase)</span></td><td><span class="status-label">@WorkflowLabels.Assessment(item.State)</span></td><td>@item.ScoredCriteria / @item.CriterionCount @(item.CanScore ? "ready" : "recorded")</td><td><time datetime="@item.AssessmentDeadlineUtc.ToString("O")">@item.AssessmentDeadlineUtc.ToString("dd MMM yyyy HH:mm") UTC</time></td></tr>
+    }
+    </tbody></table></div>
+}
+</div></section>
