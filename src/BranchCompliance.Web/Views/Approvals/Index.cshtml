@@ -1,0 +1,18 @@
+@model IReadOnlyList<BranchCompliance.Application.Approval.ApprovalPeriodItem>
+@{ ViewData["Title"] = "Appeal review & finalization"; }
+<p class="text-secondary mb-4">Review criterion appeals with their original response and evidence, then finalize only when every branch is ready.</p>
+<section class="card"><div class="card-body">
+@if (Model.Count == 0)
+{
+    <p class="mb-0">No periods are available for appeal review or finalization.</p>
+}
+else
+{
+    <div class="table-responsive"><table class="table align-middle"><caption class="visually-hidden">Periods requiring approval work</caption><thead><tr><th>Period</th><th>Phase</th><th>Pending appeals</th><th>Ready assessments</th><th>Finalization deadline</th></tr></thead><tbody>
+    @foreach (var item in Model)
+    {
+        <tr><td><a asp-action="Details" asp-route-id="@item.PeriodId">@item.Name</a></td><td><span class="status-label">@WorkflowLabels.Phase(item.Phase)</span></td><td>@item.PendingAppeals</td><td>@item.ReadyAssessments / @item.AssessmentCount</td><td><time datetime="@item.FinalizationDeadlineUtc.ToString("O")">@item.FinalizationDeadlineUtc.ToString("dd MMM yyyy HH:mm") UTC</time></td></tr>
+    }
+    </tbody></table></div>
+}
+</div></section>

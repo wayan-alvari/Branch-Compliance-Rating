@@ -1,4 +1,5 @@
 using BranchCompliance.Application.Appeals;
+using BranchCompliance.Application.Approval;
 using BranchCompliance.Application.Configuration;
 using BranchCompliance.Application.Dashboard;
 using BranchCompliance.Application.Periods;
@@ -36,6 +37,8 @@ public static class ServiceRegistration
         services.AddScoped<IScoringStore, ScoringStore>();
         services.AddScoped<ScoringService>();
         services.AddScoped<AppealService>();
+        services.AddScoped<IApprovalStore, ApprovalStore>();
+        services.AddScoped<ApprovalService>();
         services.AddScoped<WorkspaceContext>();
         services.AddScoped<IWorkspaceContext>(provider => provider.GetRequiredService<WorkspaceContext>());
         services.AddSingleton<WorkspaceCoordinator>();

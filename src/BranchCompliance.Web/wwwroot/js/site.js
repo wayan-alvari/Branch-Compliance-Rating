@@ -36,3 +36,12 @@ document.getElementById('add-rating-band')?.addEventListener('click', () => {
     numberBandRows();
     row.querySelector('input').focus();
 });
+
+document.querySelectorAll('[data-decision-form]').forEach(form => {
+    const revised = form.querySelector('[data-revised-score]');
+    form.querySelectorAll('input[name="Decision"]').forEach(choice => choice.addEventListener('change', () => {
+        const accepted = choice.checked && choice.value === 'Accept';
+        revised.required = accepted;
+        if (choice.checked && !accepted) revised.value = '';
+    }));
+});

@@ -22,7 +22,7 @@ ignored. No deployment, remote push, history rewrite, or Docker is authorized.
 | 8 | Responses, protected evidence, submission | Branch/evidence tests | `feat(submissions): collect branch compliance evidence` | Complete |
 | 9 | Assessor scoring and weighted results | Decimal/scoring tests | `feat(scoring): calculate provisional branch ratings` | Complete |
 | 10 | Publication and criterion appeals | Window/appeal tests | `feat(appeals): add provisional result appeals` | Complete |
-| 11 | Appeal decisions and finalization | Authorization/finalization tests | `feat(approval): finalize appealed compliance results` | Pending |
+| 11 | Appeal decisions and finalization | Authorization/finalization tests | `feat(approval): finalize appealed compliance results` | Complete |
 | 12 | Ranking, filters, exports, audit | Tie/filter/export tests | `feat(reports): publish compliance ratings and ranking` | Pending |
 | 13 | Security, errors, health, accessibility | All quality gates and workflow regression | `test: harden branch compliance application` | Pending |
 | 14 | Screenshots, setup, publish/rollback handoff | Clean-clone and Release publish rehearsal | `docs: complete branch compliance project handoff` | Pending |
@@ -158,3 +158,14 @@ layout, browser errors, and clean working tree.
   pending, and is downloadable in Branch, assigned Assessor, and Approver appeal
   context. Tests cover the three-file limit, post-decision removal lock, unpublished
   result hiding, all non-Branch command denials, and cross-browser isolation.
+- Milestone 11: formatting and Release build passed without warnings or errors;
+  29 unit tests and 55 SQLite integration tests passed. The Approver-only queue
+  reports pending appeals and per-branch readiness, while its review presents the
+  immutable original score/note, branch response and evidence, appeal reason,
+  clarification, and appeal evidence side by side. Tests reject acceptance without
+  a revised score, rejection with a revised score, duplicate decisions, premature
+  and repeated finalization, wrong roles, and foreign workspaces. An accepted
+  80.00-to-100.00 criterion change creates attributed revision 2; a rejected appeal
+  adds no revision. Finalization preserves provisional 80.00, recomputes final
+  82.00 / Good, freezes all five results, audits the transition, and exposes the
+  final value to the owning Branch User.

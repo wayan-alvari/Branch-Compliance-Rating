@@ -1,13 +1,14 @@
 @using BranchCompliance.Domain.Assessments
 @model BranchCompliance.Application.Appeals.AppealDetails
 @{
-    ViewData["Title"] = $"{Model.Assessment.BranchName} provisional result";
     var period = Model.Period;
     var assessment = Model.Assessment;
+    var final = period.Phase == PeriodPhase.Finalized && assessment.FinalScore is not null;
+    ViewData["Title"] = $"{assessment.BranchName} {(final ? "final" : "provisional")} result";
 }
 <div asp-validation-summary="All" class="text-danger" role="alert"></div>
 <section class="card mb-4"><div class="card-body">
-    <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap"><div><span class="status-label">@WorkflowLabels.Phase(period.Phase)</span><h2 class="h4 mt-3 mb-1">@period.Name</h2><p class="text-secondary mb-0">@assessment.BranchCode · @assessment.Region</p></div><div class="text-end"><span class="small text-secondary d-block">Published provisional result</span><strong class="summary-score">@assessment.ProvisionalScore!.Value.ToString("F2")</strong><span>@assessment.ProvisionalRating</span></div></div>
+    <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap"><div><span class="status-label">@WorkflowLabels.Phase(period.Phase)</span><h2 class="h4 mt-3 mb-1">@period.Name</h2><p class="text-secondary mb-0">@assessment.BranchCode · @assessment.Region</p></div><div class="text-end"><span class="small text-secondary d-block">@(final ? "Final result" : "Published provisional result")</span><strong class="summary-score">@(final ? assessment.FinalScore!.Value.ToString("F2") : assessment.ProvisionalScore!.Value.ToString("F2"))</strong><span>@(final ? assessment.FinalRating : assessment.ProvisionalRating)</span>@if (final) { <small class="text-secondary d-block">Provisional @assessment.ProvisionalScore!.Value.ToString("F2") · @assessment.ProvisionalRating</small> }</div></div>
     <p class="small text-secondary mt-3 mb-0"><code>Overall = sum(score × weight / 100)</code>. The final sum uses two decimal places and midpoint rounding away from zero.</p>
     <p class="small @(Model.CanAppeal ? "text-secondary" : "text-danger") mt-2 mb-0"><time datetime="@period.AppealDeadlineUtc.ToString("O")">Appeal deadline: @period.AppealDeadlineUtc.ToString("dd MMM yyyy HH:mm") UTC</time>. @(Model.CanAppeal ? "The appeal window is open." : "The appeal window is closed.")</p>
 </div></section>

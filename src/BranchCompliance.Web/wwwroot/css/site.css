@@ -79,4 +79,11 @@ a { color: #076762; }
 .appeal-record dt { color: var(--muted); }
 .appeal-record dd { white-space: pre-wrap; }
 @media (max-width: 575.98px) { .appeal-record dl { grid-template-columns: 1fr; gap: .15rem; } .appeal-record dd { margin-bottom: .7rem; } }
+.approval-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+.approval-columns > section + section { border-left: 1px solid var(--line); padding-left: 2rem; }
+.approval-columns dl { display: grid; grid-template-columns: 8rem minmax(0, 1fr); gap: .35rem 1rem; }
+.approval-columns dt { color: var(--muted); }
+.approval-columns dd { white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (max-width: 991.98px) { .approval-columns { grid-template-columns: 1fr; } .approval-columns > section + section { border-left: 0; border-top: 1px solid var(--line); padding: 1.5rem 0 0; } }
+@media (max-width: 575.98px) { .approval-columns dl { grid-template-columns: 1fr; gap: .15rem; } .approval-columns dd { margin-bottom: .7rem; } }
 @media (max-width: 575.98px) { .navbar-brand { font-size: 1rem; } .app-header .container-fluid { gap: .6rem; } .demo-notice { padding: .7rem 1rem; } }

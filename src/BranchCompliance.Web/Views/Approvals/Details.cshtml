@@ -1,0 +1,48 @@
+@using BranchCompliance.Domain.Assessments
+@model BranchCompliance.Application.Approval.ApprovalDetails
+@{
+    ViewData["Title"] = $"Approve {Model.Period.Name}";
+    var period = Model.Period;
+    var pending = Model.Appeals.Count(row => row.Appeal.Decision == AppealDecision.Pending);
+}
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+<section class="card mb-4"><div class="card-body">
+    <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap"><div><span class="status-label">@WorkflowLabels.Phase(period.Phase)</span><h2 class="h4 mt-3 mb-1">@period.Name</h2><p class="text-secondary mb-0">@pending pending appeal@(pending == 1 ? "" : "s") · @Model.Assessments.Count(row => row.State is AssessmentState.AwaitingFinalization or AssessmentState.Finalized) / @Model.Assessments.Count branches ready</p></div><div class="text-end"><time class="small text-secondary d-block" datetime="@period.FinalizationDeadlineUtc.ToString("O")">Finalization deadline<br />@period.FinalizationDeadlineUtc.ToString("dd MMM yyyy HH:mm") UTC</time>
+        @if (period.Phase == PeriodPhase.FinalReview) { <form asp-action="Finalize" asp-route-id="@period.Id" method="post" class="mt-3" data-confirm="Finalize all branch results? Final scores will become read only."><button class="btn btn-primary" type="submit" disabled="@(!Model.CanFinalize)">Finalize all results</button></form> }
+    </div></div>
+    @if (period.Phase == PeriodPhase.AppealOpen) { <p class="small text-secondary mt-3 mb-0">Decisions may be recorded now. Finalization opens after the Administrator closes the appeal window.</p> }
+    else if (period.Phase == PeriodPhase.FinalReview && !Model.CanFinalize) { <p class="small text-danger mt-3 mb-0">Resolve every pending appeal and bring each assessment to awaiting finalization.</p> }
+    else if (period.Phase == PeriodPhase.Finalized) { <p class="small text-secondary mt-3 mb-0">Final results and score revisions are immutable.</p> }
+</div></section>
+
+<section class="card mb-4"><div class="card-header bg-transparent"><h2 class="h5 mb-0">Assessment readiness</h2></div><div class="card-body"><div class="table-responsive"><table class="table align-middle"><caption class="visually-hidden">Branch finalization readiness</caption><thead><tr><th>Branch</th><th>Status</th><th>Appeals</th><th>Provisional result</th><th>Final result</th></tr></thead><tbody>
+@foreach (var assessment in Model.Assessments)
+{
+    <tr><td>@assessment.BranchName</td><td><span class="status-label">@WorkflowLabels.Assessment(assessment.State)</span></td><td>@assessment.Appeals.Count(row => row.Decision == AppealDecision.Pending) pending / @assessment.Appeals.Count total</td><td>@assessment.ProvisionalScore?.ToString("F2") · @assessment.ProvisionalRating</td><td>@(assessment.FinalScore is null ? "Not finalized" : $"{assessment.FinalScore:F2} · {assessment.FinalRating}")</td></tr>
+}
+</tbody></table></div></div></section>
+
+<h2 class="h4 mb-3">Criterion appeals</h2>
+@if (Model.Appeals.Count == 0) { <div class="alert alert-light border">No criterion appeals were submitted in this period.</div> }
+@foreach (var row in Model.Appeals)
+{
+    <section class="card approval-card mb-4"><div class="card-header bg-transparent d-flex justify-content-between gap-3 flex-wrap"><div><h3 class="h5 mb-1">@row.Assessment.BranchName · @row.Criterion.Code</h3><span class="small text-secondary">@row.Criterion.Title</span></div><span class="status-label">@row.Appeal.Decision</span></div><div class="card-body"><div class="approval-columns">
+        <section><h4 class="h6">Original assessment record</h4><dl><dt>Original score</dt><dd><strong>@row.Appeal.OriginalScore.ToString("F2")</strong> · revision @row.OriginalScore.Revision</dd><dt>Assessor note</dt><dd>@(string.IsNullOrEmpty(row.OriginalScore.Note) ? "No score note." : row.OriginalScore.Note)</dd><dt>Branch response</dt><dd>@(row.Response?.Answer ?? "No response recorded.")</dd><dt>Response comment</dt><dd>@(string.IsNullOrEmpty(row.Response?.Comment) ? "No comment." : row.Response.Comment)</dd></dl><h5 class="small fw-semibold">Response evidence</h5>@if (row.ResponseEvidence.Count == 0) { <p class="small text-secondary">No response evidence.</p> } else { <ul class="list-unstyled">@foreach (var file in row.ResponseEvidence) { <li><a asp-controller="Evidence" asp-action="Download" asp-route-id="@file.Id">@file.OriginalName</a></li> }</ul> }</section>
+        <section><h4 class="h6">Branch appeal</h4><dl><dt>Reason</dt><dd>@row.Appeal.Reason</dd><dt>Clarification</dt><dd>@(string.IsNullOrEmpty(row.Appeal.Clarification) ? "No additional clarification." : row.Appeal.Clarification)</dd><dt>Submitted</dt><dd><time datetime="@row.Appeal.SubmittedAtUtc.ToString("O")">@row.Appeal.SubmittedAtUtc.ToString("dd MMM yyyy HH:mm") UTC</time></dd></dl><h5 class="small fw-semibold">Appeal evidence</h5>@if (row.AppealEvidence.Count == 0) { <p class="small text-secondary">No appeal evidence.</p> } else { <ul class="list-unstyled">@foreach (var file in row.AppealEvidence) { <li><a asp-controller="Evidence" asp-action="Download" asp-route-id="@file.Id">@file.OriginalName</a></li> }</ul> }
+        @if (row.CanDecide)
+        {
+            <form asp-action="Decide" asp-route-id="@period.Id" method="post" class="decision-form border-top pt-3" data-decision-form>
+                <input type="hidden" name="AssessmentId" value="@row.Assessment.Id" /><input type="hidden" name="AppealId" value="@row.Appeal.Id" />
+                <fieldset class="mb-3"><legend class="form-label">Decision</legend><div class="d-flex gap-3"><label class="form-check"><input class="form-check-input" type="radio" name="Decision" value="Accept" required /> Accept with revised score</label><label class="form-check"><input class="form-check-input" type="radio" name="Decision" value="Reject" required /> Reject and retain original</label></div></fieldset>
+                <div class="mb-3"><label class="form-label" for="revised-@row.Appeal.Id">Revised score</label><input class="form-control" id="revised-@row.Appeal.Id" name="RevisedScore" type="number" min="0" max="100" step="0.01" data-revised-score /><div class="form-text">Required only when accepting.</div></div>
+                <div class="mb-3"><label class="form-label" for="decision-note-@row.Appeal.Id">Decision note</label><textarea class="form-control" id="decision-note-@row.Appeal.Id" name="Note" rows="4" maxlength="2000" required></textarea></div>
+                <button class="btn btn-primary btn-sm" type="submit" data-confirm="Record this appeal decision? The decision cannot be edited.">Record decision</button>
+            </form>
+        }
+        else if (row.Appeal.Decision != AppealDecision.Pending)
+        {
+            <section class="decision-record border-top pt-3"><h5 class="h6">Recorded decision</h5><p><strong>@row.Appeal.Decision</strong>@if (row.Appeal.RevisedScore is not null) { <span> · revised score @row.Appeal.RevisedScore.Value.ToString("F2")</span> }</p><p>@row.Appeal.DecisionNote</p></section>
+        }
+        </section>
+    </div></div></section>
+}
