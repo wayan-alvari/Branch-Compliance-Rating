@@ -19,7 +19,7 @@ ignored. No deployment, remote push, history rewrite, or Docker is authorized.
 | 5 | Dashboards and work queues | View/controller tests | `feat(dashboard): show compliance workflow progress` | Complete |
 | 6 | Branches and template versions | Validation/authorization tests | `feat(templates): configure versioned criteria` | Complete |
 | 7 | Period snapshots, assignments, phases | Snapshot/transition tests | `feat(periods): open snapshotted assessment periods` | Complete |
-| 8 | Responses, protected evidence, submission | Branch/evidence tests | `feat(submissions): collect branch compliance evidence` | Pending |
+| 8 | Responses, protected evidence, submission | Branch/evidence tests | `feat(submissions): collect branch compliance evidence` | Complete |
 | 9 | Assessor scoring and weighted results | Decimal/scoring tests | `feat(scoring): calculate provisional branch ratings` | Pending |
 | 10 | Publication and criterion appeals | Window/appeal tests | `feat(appeals): add provisional result appeals` | Pending |
 | 11 | Appeal decisions and finalization | Authorization/finalization tests | `feat(approval): finalize appealed compliance results` | Pending |
@@ -127,3 +127,14 @@ layout, browser errors, and clean working tree.
   rules, and rating bands. Role denial, cross-browser isolation, deadline order,
   and premature transition errors are covered. The period page shows all phase
   deadlines, assignment progress, readiness guidance, and the immutable snapshot.
+- Milestone 8: formatting and Release build passed without warnings or errors;
+  28 unit tests and 39 SQLite integration tests passed. The Branch User HTTP
+  workflow saves all criterion drafts, reports evidence-aware completion, rejects
+  incomplete submission, accepts protected evidence, removes a draft attachment,
+  and freezes responses and files after submission. File tests cover PDF/JPEG/PNG
+  magic bytes, extension and claimed-type agreement, exact length, the 8 MB cap,
+  SHA-256, sanitized traversal-style names, randomized paths, and three-file
+  limits. Downloads verify stored length/hash and set attachment-only, no-store,
+  `sandbox`, and `nosniff` headers. Tests prove Branch User ownership, Assessor
+  access only after submission, Administrator read-only recovery, restricted
+  Approver context, cross-browser isolation, and storage outside `wwwroot`.

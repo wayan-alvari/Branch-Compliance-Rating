@@ -194,4 +194,22 @@ public sealed class AssessmentWorkflowTests
         Assert.Empty(period.Criteria);
         Assert.Equal(PeriodPhase.Draft, period.Phase);
     }
+
+    [Fact]
+    public void A_response_accepts_at_most_three_evidence_files()
+    {
+        var (_, period, assessment) = Scenario();
+        var response = assessment.SaveResponse(period, period.Criteria.First().Id,
+            "Fictional response with optional attachments.", "", "branch", Now);
+        for (var index = 0; index < 3; index++)
+        {
+            assessment.AddEvidence(period, new EvidenceFile(period.WorkspaceId, assessment.Id, response.Id, null,
+                $"sample-{index}.pdf", "application/pdf", 10, new string('A', 64), "branch", Now), "branch", Now);
+        }
+
+        var fourth = new EvidenceFile(period.WorkspaceId, assessment.Id, response.Id, null,
+            "sample-4.pdf", "application/pdf", 10, new string('B', 64), "branch", Now);
+        Assert.Throws<DomainRuleException>(() => assessment.AddEvidence(period, fourth, "branch", Now));
+        Assert.Equal(3, assessment.Evidence.Count);
+    }
 }

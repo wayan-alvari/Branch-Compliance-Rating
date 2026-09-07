@@ -1,0 +1,66 @@
+@using BranchCompliance.Domain.Assessments
+@model BranchCompliance.Application.Submissions.SubmissionDetails
+@{
+    ViewData["Title"] = $"{Model.Assessment.BranchName} submission";
+    var period = Model.Period;
+    var assessment = Model.Assessment;
+}
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+<section class="card mb-4"><div class="card-body">
+    <div class="d-flex justify-content-between gap-3 flex-wrap"><div><span class="status-label">@WorkflowLabels.Assessment(assessment.State)</span><h2 class="h4 mt-3 mb-1">@period.Name</h2><p class="text-secondary mb-0">@assessment.BranchCode · @assessment.Region · @period.TemplateName v@period.TemplateVersion</p></div><div class="text-end"><strong class="d-block">@Model.CompletedCriteria / @period.Criteria.Count complete</strong><time class="small text-secondary" datetime="@period.SubmissionDeadlineUtc.ToString("O")">Due @period.SubmissionDeadlineUtc.ToString("dd MMM yyyy HH:mm") UTC</time></div></div>
+    <label for="criterion-progress" class="visually-hidden">Completed criteria</label><progress id="criterion-progress" class="workflow-progress mt-3" max="@Math.Max(1, period.Criteria.Count)" value="@Model.CompletedCriteria">@Model.CompletedCriteria of @period.Criteria.Count</progress>
+    @if (Model.ViewerRole == DemoRoles.Administrator) { <p class="small text-secondary mt-3 mb-0">Administrator recovery view is read only. Branch responses remain attributable to the assigned Branch User.</p> }
+    else if (!Model.CanEdit && assessment.State is AssessmentState.NotStarted or AssessmentState.InProgress) { <p class="small text-danger mt-3 mb-0">This submission is outside its editable phase or UTC window.</p> }
+    else if (!Model.CanEdit) { <p class="small text-secondary mt-3 mb-0">This submission is read only after submission.</p> }
+</div></section>
+
+@foreach (var category in period.Criteria.GroupBy(row => new { row.Category, row.CategoryOrder }).OrderBy(row => row.Key.CategoryOrder).ThenBy(row => row.Key.Category))
+{
+    <section class="card mb-4"><div class="card-header bg-transparent"><h2 class="h5 mb-0">@category.Key.Category</h2></div><div class="card-body p-0">
+    @foreach (var criterion in category.OrderBy(row => row.Order).ThenBy(row => row.Code))
+    {
+        var response = assessment.Responses.SingleOrDefault(row => row.PeriodCriterionId == criterion.Id);
+        var files = response is null ? [] : assessment.Evidence.Where(row => row.ResponseId == response.Id).OrderBy(row => row.UploadedAtUtc).ToArray();
+        <article class="response-panel">
+            <div class="d-flex justify-content-between gap-3"><div><h3 class="h6 mb-1"><code>@criterion.Code</code> · @criterion.Title</h3><p class="small text-secondary mb-2">@criterion.Guidance</p></div><span class="requirement-label">@(criterion.EvidenceRequired ? "Evidence required" : "Evidence optional")</span></div>
+            @if (Model.CanEdit)
+            {
+                <form asp-action="Save" asp-route-id="@assessment.Id" method="post">
+                    <input type="hidden" name="CriterionId" value="@criterion.Id" />
+                    <div class="mb-3"><label class="form-label" for="answer-@criterion.Id">Response</label><textarea class="form-control" id="answer-@criterion.Id" name="Answer" rows="4" maxlength="2000">@response?.Answer</textarea><div class="form-text">A non-empty response is required for completion.</div></div>
+                    <div class="mb-3"><label class="form-label" for="comment-@criterion.Id">Optional comment</label><textarea class="form-control" id="comment-@criterion.Id" name="Comment" rows="2" maxlength="2000">@response?.Comment</textarea></div>
+                    <button class="btn btn-outline-primary btn-sm" type="submit">Save draft</button>
+                </form>
+            }
+            else
+            {
+                <dl class="response-readonly"><dt>Response</dt><dd>@(string.IsNullOrEmpty(response?.Answer) ? "No response recorded." : response.Answer)</dd><dt>Comment</dt><dd>@(string.IsNullOrEmpty(response?.Comment) ? "No comment." : response.Comment)</dd></dl>
+            }
+            <div class="evidence-area mt-3">
+                <h4 class="h6">Protected evidence <span class="text-secondary fw-normal">(@files.Length / 3)</span></h4>
+                @if (files.Length == 0) { <p class="small text-secondary">No evidence attached.</p> }
+                <ul class="list-unstyled">
+                @foreach (var file in files)
+                {
+                    <li class="d-flex align-items-center gap-2 flex-wrap"><a asp-controller="Evidence" asp-action="Download" asp-route-id="@file.Id">@file.OriginalName</a><span class="small text-secondary">@((file.Length / 1024m).ToString("F1")) KB · SHA-256 @file.Sha256[..12]…</span>
+                    @if (Model.CanEdit) { <form asp-action="RemoveEvidence" asp-route-id="@assessment.Id" method="post" data-confirm="Remove this draft evidence file?"><input type="hidden" name="evidenceId" value="@file.Id" /><button type="submit" class="btn btn-link text-danger btn-sm p-0">Remove</button></form> }</li>
+                }
+                </ul>
+                @if (Model.CanEdit && response is not null && files.Length < 3)
+                {
+                    <form asp-action="Upload" asp-route-id="@assessment.Id" method="post" enctype="multipart/form-data" class="d-flex align-items-end gap-2 flex-wrap">
+                        <input type="hidden" name="responseId" value="@response.Id" />
+                        <div><label class="form-label small" for="file-@criterion.Id">Attach PDF, JPEG, or PNG</label><input class="form-control form-control-sm" id="file-@criterion.Id" name="file" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required /></div>
+                        <button class="btn btn-outline-secondary btn-sm" type="submit">Upload</button>
+                    </form>
+                }
+                else if (Model.CanEdit && response is null) { <p class="small text-secondary mb-0">Save the response before attaching evidence.</p> }
+            </div>
+        </article>
+    }
+    </div></section>
+}
+@if (Model.CanEdit)
+{
+    <section class="card"><div class="card-body d-flex justify-content-between align-items-center gap-3 flex-wrap"><div><h2 class="h5 mb-1">Submit completed assessment</h2><p class="small text-secondary mb-0">Submission freezes every response and attachment.</p></div><form asp-action="Submit" asp-route-id="@assessment.Id" method="post" data-confirm="Submit this assessment? Responses and evidence will become read only."><button class="btn btn-primary" type="submit" disabled="@(!Model.CanSubmit)">Submit assessment</button></form></div></section>
+}

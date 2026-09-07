@@ -1,0 +1,18 @@
+@model IReadOnlyList<BranchCompliance.Application.Submissions.SubmissionListItem>
+@{ ViewData["Title"] = User.IsInRole(DemoRoles.Administrator) ? "Branch submission recovery" : "Branch submissions"; }
+<p class="text-secondary mb-4">@(User.IsInRole(DemoRoles.Administrator) ? "Review branch responses in read-only recovery mode." : "Complete each assigned criterion, attach required evidence, and submit before the UTC deadline.")</p>
+<section class="card"><div class="card-body">
+@if (Model.Count == 0)
+{
+    <p class="mb-0">No branch assessments are available in this workspace and role.</p>
+}
+else
+{
+    <div class="table-responsive"><table class="table align-middle"><caption class="visually-hidden">Authorized branch submissions</caption><thead><tr><th>Period</th><th>Branch</th><th>Phase</th><th>Status</th><th>Completion</th><th>Submission deadline</th></tr></thead><tbody>
+    @foreach (var item in Model)
+    {
+        <tr><td><a asp-action="Details" asp-route-id="@item.AssessmentId">@item.PeriodName</a></td><td>@item.BranchName</td><td><span class="status-label">@WorkflowLabels.Phase(item.Phase)</span></td><td><span class="status-label">@WorkflowLabels.Assessment(item.State)</span></td><td>@item.CompletedCriteria / @item.CriterionCount @(item.CanEdit ? "ready" : "complete")</td><td><time datetime="@item.SubmissionDeadlineUtc.ToString("O")">@item.SubmissionDeadlineUtc.ToString("dd MMM yyyy HH:mm") UTC</time></td></tr>
+    }
+    </tbody></table></div>
+}
+</div></section>

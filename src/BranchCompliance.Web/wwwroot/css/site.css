@@ -55,4 +55,12 @@ a { color: #076762; }
 .snapshot-category li { display: grid; grid-template-columns: 5rem minmax(12rem, 1fr) auto auto; gap: 1rem; align-items: baseline; padding: .45rem 0; }
 .snapshot-category small { color: var(--muted); }
 @media (max-width: 767.98px) { .snapshot-category li { grid-template-columns: 4.5rem 1fr auto; } .snapshot-category small { grid-column: 2 / -1; } }
+.response-panel { padding: 1.25rem; border-bottom: 1px solid var(--line); }
+.response-panel:last-child { border-bottom: 0; }
+.requirement-label { border: 1px solid var(--line); border-radius: 999px; padding: .2rem .55rem; font-size: .75rem; white-space: nowrap; }
+.response-readonly { display: grid; grid-template-columns: 7rem minmax(0, 1fr); gap: .4rem 1rem; margin-bottom: 0; }
+.response-readonly dt { color: var(--muted); }
+.response-readonly dd { white-space: pre-wrap; overflow-wrap: anywhere; }
+.evidence-area { border-left: .2rem solid var(--line); padding-left: 1rem; }
+@media (max-width: 575.98px) { .response-readonly { grid-template-columns: 1fr; gap: .2rem; } .response-readonly dd { margin-bottom: .75rem; } }
 @media (max-width: 575.98px) { .navbar-brand { font-size: 1rem; } .app-header .container-fluid { gap: .6rem; } .demo-notice { padding: .7rem 1rem; } }
