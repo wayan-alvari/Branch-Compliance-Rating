@@ -25,7 +25,7 @@ ignored. No deployment, remote push, history rewrite, or Docker is authorized.
 | 11 | Appeal decisions and finalization | Authorization/finalization tests | `feat(approval): finalize appealed compliance results` | Complete |
 | 12 | Ranking, filters, exports, audit | Tie/filter/export tests | `feat(reports): publish compliance ratings and ranking` | Complete |
 | 13 | Security, errors, health, accessibility | All quality gates and workflow regression | `test: harden branch compliance application` | Complete |
-| 14 | Screenshots, setup, publish/rollback handoff | Clean-clone and Release publish rehearsal | `docs: complete branch compliance project handoff` | Pending |
+| 14 | Screenshots, setup, publish/rollback handoff | Clean-clone and Release publish rehearsal | `docs: complete branch compliance project handoff` | Complete |
 
 ## Preflight and decisions
 
@@ -198,3 +198,28 @@ layout, browser errors, and clean working tree.
   theme, readable desktop/mobile layouts, and the rendered template version. No
   MySQL credential is available, so the optional live MySQL smoke test remains
   documented rather than claimed.
+- Milestone 14: the README now provides the complete feature tour, exact local
+  setup, four-role review path, scoring explanation, architecture map, security
+  limits, quality baseline, and links to dedicated database, testing, and manual
+  operations guides. Five reviewed Chrome captures document login, Administrator
+  workflow, competition ranking, criterion-level appeal effects, and the 390 px
+  Branch User form. Framework-dependent (56 MB) and self-contained Windows x64
+  (125 MB) Release artifacts were published to ignored locations and each started
+  successfully with a minimal HTTP 200 `Healthy` response. A self-contained
+  Windows x64 EF migration bundle (140 MB) was also generated. Windows and Linux
+  x64 runtime graphs are committed in the locks, and the local-SDK helper isolates
+  EF's generated bundle project from repository central-package policy.
+- Clean-clone rehearsal at `0ba94b5` used SDK 8.0.424, restored the EF tool and
+  all NuGet/npm dependencies from committed locks, copied only production web
+  assets, passed format verification, built Release with zero warnings/errors,
+  passed 29 unit and 65 integration tests, and produced a framework-dependent
+  Release publish. Its working tree remained clean; local control documents were
+  absent while all five public screenshots were present. Public Markdown links
+  resolve. Current-tree and full-history scans found no Docker files, local
+  controls, credentials, connection secrets, private keys, databases, uploads,
+  evidence, build output, publish output, company identifiers, or proprietary
+  content. The sole secret-pattern match is a negative test assertion that SQL
+  does not contain `Password=`; proprietary-word matches are the required
+  independence disclaimers. Dependency notices and licenses were inspected.
+  Nothing was deployed or pushed. Without an owner-supplied MySQL credential, the
+  documented live MySQL smoke workflow remains the one optional external check.
