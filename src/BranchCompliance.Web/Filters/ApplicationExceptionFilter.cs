@@ -4,10 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Extensions.Logging;
 
 namespace BranchCompliance.Web.Filters;
 
-public sealed class ApplicationExceptionFilter : IExceptionFilter
+public sealed class ApplicationExceptionFilter(ILogger<ApplicationExceptionFilter> logger) : IExceptionFilter
 {
     public void OnException(ExceptionContext context)
     {
@@ -20,6 +21,10 @@ public sealed class ApplicationExceptionFilter : IExceptionFilter
             _ => (0, "")
         };
         if (problem.Item1 == 0) return;
+        logger.LogInformation(new EventId(1001, "ExpectedRequestFailure"),
+            "Request rejected with status {StatusCode} by {Action}; failure type {FailureType}.",
+            problem.Item1, context.ActionDescriptor.DisplayName ?? "unknown action",
+            context.Exception.GetType().Name);
         context.Result = new ViewResult
         {
             ViewName = "~/Views/Home/Problem.cshtml",

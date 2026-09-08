@@ -24,7 +24,7 @@ ignored. No deployment, remote push, history rewrite, or Docker is authorized.
 | 10 | Publication and criterion appeals | Window/appeal tests | `feat(appeals): add provisional result appeals` | Complete |
 | 11 | Appeal decisions and finalization | Authorization/finalization tests | `feat(approval): finalize appealed compliance results` | Complete |
 | 12 | Ranking, filters, exports, audit | Tie/filter/export tests | `feat(reports): publish compliance ratings and ranking` | Complete |
-| 13 | Security, errors, health, accessibility | All quality gates and workflow regression | `test: harden branch compliance application` | Pending |
+| 13 | Security, errors, health, accessibility | All quality gates and workflow regression | `test: harden branch compliance application` | Complete |
 | 14 | Screenshots, setup, publish/rollback handoff | Clean-clone and Release publish rehearsal | `docs: complete branch compliance project handoff` | Pending |
 
 ## Preflight and decisions
@@ -182,3 +182,19 @@ layout, browser errors, and clean working tree.
   host-independent rendering. Tests cover all four export scopes, unpublished
   result rejection, foreign-workspace IDs, anonymous redirects, audit text and
   actor search, and Administrator/own/assigned/approval audit contexts.
+- Milestone 13: every quality-gate command completed. Locked restore and npm
+  install/audit passed, with zero npm or NuGet vulnerabilities. The deprecation
+  audit reports only test-only xUnit 2.9.3 as legacy; it is deliberately retained
+  on the tested v2 line instead of silently crossing a major-version boundary.
+  Formatting verification and the Release build passed with zero warnings or
+  errors; 29 unit tests and 65 SQLite integration tests passed. New regression
+  coverage verifies minimal liveness, secure/no-store cookies and headers,
+  bounded forms and uploads, one-hop trusted proxy forwarding, safe status/error
+  responses, non-sensitive structured logging, accessible landmarks, labels,
+  captions, unique IDs, responsive breakpoints, and representative pages for all
+  four roles. Chrome 152 exercised the real Kestrel site through all four role
+  logins, XLSX and PDF downloads, and a 390-by-844 branch form. It reported no
+  console errors or horizontal overflow. Visual review confirmed the fixed light
+  theme, readable desktop/mobile layouts, and the rendered template version. No
+  MySQL credential is available, so the optional live MySQL smoke test remains
+  documented rather than claimed.

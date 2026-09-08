@@ -19,7 +19,7 @@ else
         {
             <tr>
                 <td><a asp-action="Details" asp-route-id="@period.Id">@period.Name</a></td>
-                <td>@period.TemplateName <span class="text-secondary">v@period.TemplateVersion</span></td>
+                <td>@period.TemplateName <span class="text-secondary">v@(period.TemplateVersion)</span></td>
                 <td><span class="status-label">@period.Phase</span></td>
                 <td><time datetime="@period.OpensAtUtc.ToString("O")">@period.OpensAtUtc.ToString("dd MMM yyyy HH:mm 'UTC'")</time></td>
                 <td><time datetime="@period.FinalizationDeadlineUtc.ToString("O")">@period.FinalizationDeadlineUtc.ToString("dd MMM yyyy HH:mm 'UTC'")</time></td>

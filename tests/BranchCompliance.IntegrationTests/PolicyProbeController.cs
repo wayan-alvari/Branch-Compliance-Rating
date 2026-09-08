@@ -29,4 +29,8 @@ public sealed class PolicyProbeController : Controller
 
     [HttpGet("/test-policy/Approver"), Authorize(Policy = DemoRoles.Approver)]
     public IActionResult Approver() => Ok();
+
+    [HttpGet("/test-error"), Authorize]
+    public IActionResult ErrorProbe()
+        => throw new InvalidOperationException("Internal diagnostic detail must remain server-side.");
 }

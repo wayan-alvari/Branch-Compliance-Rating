@@ -1,8 +1,16 @@
+try { localStorage.setItem('lte-theme', 'light'); } catch { /* The document already declares the light fallback. */ }
+document.documentElement.setAttribute('data-bs-theme', 'light');
+
 document.querySelectorAll('.demo-account').forEach(button => {
     button.addEventListener('click', () => {
-        document.getElementById('Email').value = button.dataset.email;
-        document.getElementById('Password').value = 'PortfolioDemo123!';
-        document.getElementById('Password').focus();
+        const email = document.getElementById('Email');
+        const password = document.getElementById('Password');
+        if (!email || !password) return;
+        email.value = button.dataset.email;
+        password.value = 'PortfolioDemo123!';
+        password.focus();
+        const announcement = document.getElementById('demo-account-selection');
+        if (announcement) announcement.textContent = `Selected ${button.dataset.email}. Password filled.`;
     });
 });
 document.querySelectorAll('form[data-confirm]').forEach(form => {
