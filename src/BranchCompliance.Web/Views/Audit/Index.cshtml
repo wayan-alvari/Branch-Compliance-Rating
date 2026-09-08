@@ -1,0 +1,15 @@
+@model BranchCompliance.Application.Reports.AuditHistory
+@{ ViewData["Title"] = "Audit history"; }
+<p class="text-secondary mb-4">Search immutable, non-sensitive activity in the context authorized for your current role.</p>
+<section class="card mb-4"><div class="card-body"><form method="get" class="row g-3 align-items-end" aria-label="Audit filters">
+    <div class="col-lg-3"><label class="form-label" for="query">Action or details</label><input class="form-control" id="query" name="Query" value="@Model.Filter.Query" maxlength="120" /></div>
+    <div class="col-lg-3"><label class="form-label" for="actor">Actor</label><input class="form-control" id="actor" name="Actor" value="@Model.Filter.Actor" maxlength="120" placeholder="Email or system" /></div>
+    <div class="col-md-4 col-lg-2"><label class="form-label" for="from">From date (UTC)</label><input class="form-control" id="from" name="From" type="date" value="@Model.Filter.FromUtc?.ToString("yyyy-MM-dd")" /></div>
+    <div class="col-md-4 col-lg-2"><label class="form-label" for="to">To date (UTC)</label><input class="form-control" id="to" name="To" type="date" value="@Model.Filter.ToExclusiveUtc?.AddDays(-1).ToString("yyyy-MM-dd")" /></div>
+    <div class="col-md-4 col-lg-2 d-flex gap-2"><button class="btn btn-primary" type="submit">Search</button><a class="btn btn-outline-secondary" asp-action="Index">Clear</a></div>
+</form></div></section>
+<section class="card"><div class="card-header bg-transparent"><h2 class="h5 mb-0">Authorized events <span class="text-secondary fw-normal">(@Model.Rows.Count)</span></h2></div><div class="card-body p-0">
+@if (Model.Rows.Count == 0) { <p class="p-4 mb-0 text-secondary">No authorized audit events match these filters.</p> }
+else { <div class="table-responsive"><table class="table align-middle mb-0"><caption class="visually-hidden">Authorized audit history</caption><thead><tr><th>Time (UTC)</th><th>Actor</th><th>Action</th><th>Safe details</th><th>Record</th></tr></thead><tbody>@foreach (var row in Model.Rows) { <tr><td><time datetime="@row.AtUtc.ToString("O")">@row.AtUtc.ToString("dd MMM yyyy HH:mm")</time></td><td>@row.Actor</td><td><strong>@row.Action</strong></td><td>@row.Details</td><td><code>@row.EntityId</code></td></tr> }</tbody></table></div> }
+@if (Model.IsLimited) { <p class="small text-secondary p-3 mb-0">Showing the newest 200 matching events. Narrow the search to see older activity.</p> }
+</div></section>

@@ -10,4 +10,8 @@
     <PackageReference Include="ClosedXML" />
     <PackageReference Include="PDFsharp-MigraDoc" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Reports/Fonts/Basic-Regular.ttf" LogicalName="BranchCompliance.Basic.Regular.ttf" />
+    <None Update="Reports/Fonts/OFL.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

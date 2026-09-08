@@ -74,7 +74,7 @@ else
         @if (Model.History.Count == 0) { <p class="text-secondary">No final results are available in your assignments yet.</p> }
         @foreach (var result in Model.History)
         {
-            <div class="result-teaser"><div class="d-flex justify-content-between gap-3"><div><strong>@result.BranchName</strong><span class="d-block small text-secondary">@result.PeriodName · Rank @result.Rank</span></div><div class="text-end"><strong>@result.Score.ToString("F2")</strong><span class="d-block small">@result.Rating</span></div></div><meter class="score-meter" min="0" max="100" value="@result.Score.ToString(System.Globalization.CultureInfo.InvariantCulture)" aria-label="@result.BranchName final score @result.Score out of 100">@result.Score / 100</meter></div>
+            <div class="result-teaser"><div class="d-flex justify-content-between gap-3"><div><a asp-controller="Reports" asp-action="Details" asp-route-id="@result.AssessmentId"><strong>@result.BranchName</strong></a><span class="d-block small text-secondary">@result.PeriodName · Rank @result.Rank</span></div><div class="text-end"><strong>@result.Score.ToString("F2")</strong><span class="d-block small">@result.Rating</span></div></div><meter class="score-meter" min="0" max="100" value="@result.Score.ToString(System.Globalization.CultureInfo.InvariantCulture)" aria-label="@result.BranchName final score @result.Score out of 100">@result.Score / 100</meter></div>
         }
     </div></section></div>
     <div class="col-xl-6"><section class="card h-100"><div class="card-header bg-transparent"><h2 class="h5 mb-0">Recent activity</h2></div><div class="card-body">

@@ -1,0 +1,27 @@
+@using BranchCompliance.Domain.Assessments
+@model BranchCompliance.Application.Reports.ResultDetails
+@{
+    var final = Model.Assessment.State == AssessmentState.Finalized;
+    var score = final ? Model.Assessment.FinalScore : Model.Assessment.ProvisionalScore;
+    var rating = final ? Model.Assessment.FinalRating : Model.Assessment.ProvisionalRating;
+    ViewData["Title"] = $"{Model.Assessment.BranchName} result";
+}
+<section class="card mb-4"><div class="card-body"><div class="d-flex justify-content-between align-items-start gap-3 flex-wrap"><div><span class="status-label">@WorkflowLabels.Assessment(Model.Assessment.State)</span><h2 class="h4 mt-3 mb-1">@Model.Period.Name</h2><p class="text-secondary mb-0">@Model.Assessment.BranchCode · @Model.Assessment.Region</p></div><div class="text-end"><span class="small text-secondary d-block">@(final ? "Final result" : "Published provisional result")</span><strong class="summary-score">@score!.Value.ToString("F2")</strong><span>@rating</span>@if (final) { <small class="text-secondary d-block">Rank @Model.Rank · provisional @Model.Assessment.ProvisionalScore!.Value.ToString("F2")</small><a class="btn btn-outline-primary btn-sm mt-3" asp-action="BranchSummary" asp-route-id="@Model.Assessment.Id">Download PDF summary</a> }</div></div><p class="small text-secondary mt-3 mb-0"><code>Overall = sum(score × weight / 100)</code>. Contributions retain decimal precision; only the overall result is rounded to two places, away from zero.</p></div></section>
+
+<h2 class="h4 mb-3">Criterion contributions and appeal effects</h2>
+@foreach (var category in Model.Criteria.GroupBy(row => new { row.Criterion.Category, row.Criterion.CategoryOrder }))
+{
+    <section class="card mb-4"><div class="card-header bg-transparent"><h2 class="h5 mb-0">@category.Key.Category</h2></div><div class="card-body p-0">
+    @foreach (var row in category)
+    {
+        <article class="result-criterion"><div class="d-flex justify-content-between gap-3 flex-wrap"><div><h3 class="h6 mb-1"><code>@row.Criterion.Code</code> · @row.Criterion.Title</h3><p class="small text-secondary mb-2">@row.Criterion.Guidance</p></div><div class="text-end"><strong class="score-number">@row.FinalScore.Value.ToString("F2")</strong><span class="small text-secondary d-block">@row.Criterion.Weight.ToString("F2")% · contribution @row.Contribution.ToString("F4")</span></div></div>
+        @if (!string.IsNullOrEmpty(row.FinalScore.Note)) { <p class="score-note"><strong>Score note:</strong> @row.FinalScore.Note</p> }
+        @if (row.Appeal is { } appeal)
+        {
+            <div class="appeal-effect"><div><strong>Appeal @appeal.Decision.ToString().ToLowerInvariant()</strong><span class="d-block small">Original @row.ProvisionalScore.Value.ToString("F2") → final @row.FinalScore.Value.ToString("F2") (@(row.Effect >= 0 ? "+" : "")@row.Effect.ToString("F2"))</span></div><p class="mb-0">@appeal.DecisionNote</p></div>
+        }
+        else { <p class="small text-secondary mb-0">No appeal · provisional score retained.</p> }
+        </article>
+    }
+    </div></section>
+}

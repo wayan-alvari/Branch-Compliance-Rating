@@ -18,6 +18,7 @@ files are the authoritative resolved dependency inventory.
 | @popperjs/core | 2.11.8 | MIT | https://github.com/floating-ui/floating-ui/tree/v2.x | Bootstrap positioning |
 | ClosedXML | 0.105.1 | MIT | https://github.com/ClosedXML/ClosedXML | XLSX reports |
 | PDFsharp/MigraDoc | 6.2.4 | MIT | https://github.com/empira/PDFsharp | PDF summaries |
+| Basic font | 1.000 | SIL OFL-1.1 | https://github.com/google/fonts/tree/main/ofl/basic | Embedded, host-independent PDF text |
 | Microsoft.AspNetCore.Mvc.Testing | 8.0.30 | MIT | https://github.com/dotnet/aspnetcore | In-process HTTP integration tests |
 | Microsoft.EntityFrameworkCore.Sqlite | 8.0.30 | MIT | https://github.com/dotnet/efcore | Secret-free relational tests and explicit local demo |
 | Microsoft.NET.Test.Sdk | 17.14.1 | MIT | https://github.com/microsoft/vstest | Test host |

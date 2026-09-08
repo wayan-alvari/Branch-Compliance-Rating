@@ -1,0 +1,31 @@
+@using BranchCompliance.Domain.Assessments
+@model BranchCompliance.Application.Reports.ResultList
+@{ ViewData["Title"] = "Results & ranking"; }
+<p class="text-secondary mb-4">Inspect authorized results, apply the same filters to the screen and spreadsheet, and open a branch result for criterion-level effects.</p>
+<section class="card mb-4"><div class="card-body">
+    <form method="get" class="row g-3 align-items-end" aria-label="Result filters">
+        <div class="col-lg-3"><label class="form-label" for="period">Period</label><select class="form-select" id="period" name="PeriodId">
+            @foreach (var period in Model.Periods) { <option value="@period.Id" selected="@(period.Id == Model.SelectedPeriod.Id)">@period.Name</option> }
+        </select></div>
+        <div class="col-lg-3"><label class="form-label" for="query">Branch or region</label><input class="form-control" id="query" name="Query" value="@Model.Filter.Query" maxlength="120" /></div>
+        <div class="col-md-4 col-lg-2"><label class="form-label" for="rating">Rating</label><select class="form-select" id="rating" name="Rating"><option value="">All ratings</option>@foreach (var rating in Model.Ratings) { <option value="@rating" selected="@(rating == Model.Filter.Rating)">@rating</option> }</select></div>
+        <div class="col-md-4 col-lg-2"><label class="form-label" for="status">Status</label><select class="form-select" id="status" name="Status"><option value="">All statuses</option>@foreach (var status in Enum.GetValues<AssessmentState>()) { <option value="@status" selected="@(status == Model.Filter.Status)">@WorkflowLabels.Assessment(status)</option> }</select></div>
+        <div class="col-md-4 col-lg-2 d-flex gap-2"><button class="btn btn-primary" type="submit">Apply</button><a class="btn btn-outline-secondary" asp-action="Index" asp-route-periodId="@Model.SelectedPeriod.Id">Clear</a></div>
+    </form>
+</div></section>
+
+<section class="card"><div class="card-header bg-transparent d-flex justify-content-between align-items-center gap-3 flex-wrap"><div><h2 class="h5 mb-1">@Model.SelectedPeriod.Name</h2><span class="small text-secondary">@Model.Rows.Count authorized result@(Model.Rows.Count == 1 ? "" : "s") · competition ranking uses 1, 1, 3 for ties</span></div><a class="btn btn-outline-primary btn-sm" asp-action="Spreadsheet" asp-route-periodId="@Model.SelectedPeriod.Id" asp-route-query="@Model.Filter.Query" asp-route-rating="@Model.Filter.Rating" asp-route-status="@Model.Filter.Status">Export filtered XLSX</a></div><div class="card-body p-0">
+@if (Model.Rows.Count == 0)
+{
+    <p class="p-4 mb-0 text-secondary">No authorized results match these filters.</p>
+}
+else
+{
+    <div class="table-responsive"><table class="table align-middle mb-0"><caption class="visually-hidden">Authorized branch results and competition ranking</caption><thead><tr><th>Rank</th><th>Branch</th><th>Region</th><th>Status</th><th class="text-end">Published result</th></tr></thead><tbody>
+    @foreach (var row in Model.Rows)
+    {
+        <tr><td>@(row.Rank?.ToString() ?? "—")</td><td><strong>@row.BranchName</strong><span class="d-block small text-secondary">@row.BranchCode</span></td><td>@row.Region</td><td><span class="status-label">@WorkflowLabels.Assessment(row.Status)</span></td><td class="text-end">@if (row.Score is null) { <span class="text-secondary">Not published</span> } else { <a asp-action="Details" asp-route-id="@row.AssessmentId"><strong>@row.Score.Value.ToString("F2")</strong><span class="d-block small">@row.Rating</span></a> }</td></tr>
+    }
+    </tbody></table></div>
+}
+</div></section>

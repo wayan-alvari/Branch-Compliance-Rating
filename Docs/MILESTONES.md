@@ -23,7 +23,7 @@ ignored. No deployment, remote push, history rewrite, or Docker is authorized.
 | 9 | Assessor scoring and weighted results | Decimal/scoring tests | `feat(scoring): calculate provisional branch ratings` | Complete |
 | 10 | Publication and criterion appeals | Window/appeal tests | `feat(appeals): add provisional result appeals` | Complete |
 | 11 | Appeal decisions and finalization | Authorization/finalization tests | `feat(approval): finalize appealed compliance results` | Complete |
-| 12 | Ranking, filters, exports, audit | Tie/filter/export tests | `feat(reports): publish compliance ratings and ranking` | Pending |
+| 12 | Ranking, filters, exports, audit | Tie/filter/export tests | `feat(reports): publish compliance ratings and ranking` | Complete |
 | 13 | Security, errors, health, accessibility | All quality gates and workflow regression | `test: harden branch compliance application` | Pending |
 | 14 | Screenshots, setup, publish/rollback handoff | Clean-clone and Release publish rehearsal | `docs: complete branch compliance project handoff` | Pending |
 
@@ -169,3 +169,16 @@ layout, browser errors, and clean working tree.
   adds no revision. Finalization preserves provisional 80.00, recomputes final
   82.00 / Good, freezes all five results, audits the transition, and exposes the
   final value to the owning Branch User.
+- Milestone 12: formatting and Release build passed without warnings or errors;
+  29 unit tests and 60 SQLite integration tests passed. The results page computes
+  global competition rank before applying role scope, orders tied branches by
+  name, and filters one period by branch/code/region, rating, and workflow status.
+  Result detail shows immutable provisional and final criterion revisions,
+  decimal contributions, accepted/rejected appeal effects, and the final rank.
+  The filtered XLSX was reopened with ClosedXML and its rows, numeric score, MIME
+  type, attachment name, and no-store policy were verified. The branch PDF was
+  reopened with PDFsharp and uses an embedded, OFL-licensed Basic font (SHA-256
+  `077F7245F6459045495B1CA0493F2B426C421D2112D10B48A38FF8858A07397A`) for
+  host-independent rendering. Tests cover all four export scopes, unpublished
+  result rejection, foreign-workspace IDs, anonymous redirects, audit text and
+  actor search, and Administrator/own/assigned/approval audit contexts.
