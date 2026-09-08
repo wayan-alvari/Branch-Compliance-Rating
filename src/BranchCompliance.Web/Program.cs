@@ -133,6 +133,7 @@ app.UseAuthentication();
 app.UseMiddleware<DemoWorkspaceMiddleware>();
 app.UseAuthorization();
 app.UseRateLimiter();
+app.MapGet("/favicon.ico", () => Results.Redirect("/favicon.svg", permanent: true)).AllowAnonymous();
 app.MapGet("/health", () => Results.Text("Healthy", "text/plain")).AllowAnonymous();
 app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
 app.Run();

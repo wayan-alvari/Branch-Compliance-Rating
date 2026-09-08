@@ -8,6 +8,18 @@ $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = '1'
 $env:DOTNET_NOLOGO = '1'
 $branchToolTemp = Join-Path $branchRepoRoot '.local/tmp'
 New-Item -ItemType Directory -Force -Path $branchToolTemp | Out-Null
+# EF migration bundles create a temporary project. Keep that project from
+# inheriting the repository's central package file while it is under .local.
+$branchTempPackages = Join-Path $branchToolTemp 'Directory.Packages.props'
+if (-not (Test-Path -LiteralPath $branchTempPackages)) {
+    @'
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+</Project>
+'@ | Set-Content -LiteralPath $branchTempPackages -Encoding utf8
+}
 $env:TEMP = $branchToolTemp
 $env:TMP = $branchToolTemp
 $branchLocalSdk = Join-Path $branchRepoRoot '.local/dotnet'

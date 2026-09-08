@@ -64,6 +64,14 @@ public sealed class HardeningTests
         Assert.True(health.Headers.CacheControl!.NoStore);
         Assert.False(health.Headers.TryGetValues("Set-Cookie", out _));
         AssertSecurityHeaders(health);
+        var faviconRedirect = await browser.GetAsync("/favicon.ico");
+        Assert.Equal(HttpStatusCode.MovedPermanently, faviconRedirect.StatusCode);
+        Assert.Equal("/favicon.svg", faviconRedirect.Headers.Location!.OriginalString);
+        Assert.False(faviconRedirect.Headers.TryGetValues("Set-Cookie", out _));
+        var favicon = await browser.GetAsync("/favicon.svg");
+        Assert.Equal(HttpStatusCode.OK, favicon.StatusCode);
+        Assert.Equal("image/svg+xml", favicon.Content.Headers.ContentType!.MediaType);
+        Assert.False(favicon.Headers.TryGetValues("Set-Cookie", out _));
         await using var scope = factory.Services.CreateAsyncScope();
         Assert.Empty(await scope.ServiceProvider.GetRequiredService<ComplianceDbContext>()
             .Workspaces.IgnoreQueryFilters().ToArrayAsync());

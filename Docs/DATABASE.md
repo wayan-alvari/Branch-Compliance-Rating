@@ -89,9 +89,9 @@ charset, collation, and separate migration/application privileges above.
 8. Export XLSX and PDF, download protected evidence, and verify a private browser
    receives different data and cannot access copied assessment/evidence URLs.
 
-The complete web steps and exports are delivered at their respective milestones;
-the milestone plan records whether they have been exercised. A passing SQLite
-suite or generated MySQL SQL is not evidence of a live MySQL migration run.
+The complete web steps and exports are implemented and covered by the normal
+suite. A passing SQLite suite or generated MySQL SQL is not evidence of a live
+MySQL migration run.
 
 The current implementation environment has MySQL 8.0.46 running but no supplied
 connection secret. No live schema or server account has been created or changed
