@@ -6,7 +6,7 @@ used.
 
 ## Prerequisites
 
-- .NET SDK 8.0.424 on the build machine.
+- A stable .NET 8 SDK, version 8.0.100 or later, on the build machine.
 - Node.js 22 and npm 10 on the build machine.
 - MySQL Community Server 8.0.46 with separate application and migration users.
 - A supported Windows x64 or Linux x64 host with a local HTTPS reverse proxy.

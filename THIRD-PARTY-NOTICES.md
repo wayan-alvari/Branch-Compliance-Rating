@@ -6,9 +6,9 @@ files are the authoritative resolved dependency inventory.
 
 ## Direct runtime and build dependencies
 
-| Dependency | Exact version | License | Official source | Purpose |
+| Dependency | Version / supported line | License | Official source | Purpose |
 |---|---|---|---|---|
-| .NET SDK | 8.0.424 | MIT | https://github.com/dotnet/sdk | Build tooling |
+| .NET SDK | 8.0.x stable (8.0.100 minimum) | MIT | https://github.com/dotnet/sdk | Build tooling; tested with 8.0.407 and 8.0.424 |
 | ASP.NET Core / Identity | 8.0.30 | MIT | https://github.com/dotnet/aspnetcore | MVC and authentication |
 | Entity Framework Core | 8.0.30 | MIT | https://github.com/dotnet/efcore | Persistence and migrations |
 | dotnet-ef | 8.0.30 | MIT | https://www.nuget.org/packages/dotnet-ef/8.0.30 | Local migration tooling |

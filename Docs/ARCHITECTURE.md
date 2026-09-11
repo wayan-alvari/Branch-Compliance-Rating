@@ -10,9 +10,11 @@ HTTP authorization using SQLite in-memory relational persistence.
 
 ## Reproducibility
 
-SDK 8.0.424 is pinned without roll-forward. Framework/EF packages stay on
-8.0.30 and the local EF tool is 8.0.30. Package versions are central; NuGet and
-npm locks are committed. Only nuget.org and the official npm registry are used.
+The SDK baseline is 8.0.100 and `global.json` selects the latest installed stable
+8.0 feature band without rolling to another major version. Framework/EF packages
+stay on 8.0.30 and the local EF tool is 8.0.30. Package versions are central;
+NuGet and npm locks are committed. Only nuget.org and the official npm registry
+are used.
 `npm ci` copies the AdminLTE production CSS/JS, Bootstrap bundle, and required
 license texts to an ignored vendor directory. No theme demo pages or photos are
 shipped. Run npm before building/publishing so these files are included.

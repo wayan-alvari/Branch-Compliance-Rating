@@ -2,8 +2,8 @@
 
 ## Standard quality gate
 
-Use .NET SDK 8.0.424, Node.js 22, and npm 10. From the repository root, run each
-command in order:
+Use a stable .NET 8 SDK (8.0.100 or later), Node.js 22, and npm 10. From the
+repository root, run each command in order:
 
 ```powershell
 dotnet tool restore

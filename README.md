@@ -31,9 +31,9 @@ product. Original code is MIT licensed, Copyright (c) 2026 Wayan Alvari.
 
 ## Run the local demo
 
-Install these exact prerequisites:
+Install these prerequisites:
 
-- .NET SDK 8.0.424
+- A stable .NET 8 SDK, version 8.0.100 or later
 - Node.js 22 and npm 10
 - PowerShell 7 or Windows PowerShell 5.1
 
@@ -51,9 +51,10 @@ Open `http://localhost:5094`. The final command explicitly enables Development,
 demo workspaces, and an ignored local SQLite database. SQLite cannot start in
 Production, and production startup never applies migrations or seeds identities.
 
-If SDK 8.0.424 is extracted to `.local/dotnet`, dot-source
+If a compatible .NET 8 SDK is extracted to `.local/dotnet`, dot-source
 `./scripts/Use-LocalSdk.ps1` before the other `dotnet` commands. The helper keeps
-SDK and NuGet caches in ignored repository directories.
+SDK and NuGet caches in ignored repository directories. `global.json` selects
+the latest installed 8.0 feature band and excludes preview SDKs.
 
 ## Demo accounts
 
